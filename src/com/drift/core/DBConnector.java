@@ -1,13 +1,18 @@
 package com.drift.core;
 
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+//import java.util.Properties;
+
+import javax.sql.DataSource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import com.drift.servlet.MyServletUtil;
 import com.drift.util.MD5Util;
@@ -28,15 +33,20 @@ public class DBConnector {
 	public static final int DB_STATUS_ERR_PASSWORD = -8;
 	public static final int DB_STATUS_ERR_USER_NOT_ACTIVATED = -9;
 	public static final int DB_STATUS_ERR_ACTIVATE_CODE = -10;
-
-
-	private String DB_PROPS_PATH = "db.properties";
-	private String dbUrl;
-	private String dbUser;
-	private String dbPwd;
-
-	public DBConnector() throws Exception{
-		Class.forName("com.mysql.jdbc.Driver");
+	
+	static DataSource ds = null;
+	
+/*	static private String DB_PROPS_PATH = "db.properties";
+	static private String dbUrl;
+	static private String dbUser;
+	static private String dbPwd;*/
+	
+	static {
+		/*try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			throw new ExceptionInInitializerError("Initialize mysql jdbc driver error!");
+		}
 
 		//System.out.println(new File(".").getAbsolutePath());
 		//System.out.println(new File("/").getAbsolutePath());
@@ -45,24 +55,42 @@ public class DBConnector {
 
 		Properties props = new Properties();
 		//String path = getClass().getResource("/") + DB_PROPS_PATH;
-		InputStream in = getClass().getClassLoader().getResourceAsStream(DB_PROPS_PATH);
+		InputStream in = DBConnector.class.getClassLoader().getResourceAsStream(DB_PROPS_PATH);
 		//System.out.println("path is: " + path);
 		//File file = new File(path);
 		try {
 			//props.load(new FileInputStream(file));
 			props.load(in);
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
 		dbUrl = props.getProperty("dbUrl");
 		dbUser = props.getProperty("dbUser");
 		dbPwd = props.getProperty("dbPwd");
 		//System.out.println("dbUrl: " + dbUrl + "; dbUser: " + dbUser + "; dbPwd: " + dbPwd);
+		*/
+		Context ctx;
+		try {
+			ctx = new InitialContext();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new ExceptionInInitializerError("No Context");		
+		}			
+		
+		try {
+			ds = (DataSource) ctx.lookup("java:comp/env/jdbc/DateDB");
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new ExceptionInInitializerError("Data source look up failure!");	
+		}
+		
 	}
 
 	public Connection getConnection()throws Exception{
-		return java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+		//return java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+		return ds.getConnection();
 	}
 
 	public void closeConnection(Connection con){
@@ -146,7 +174,7 @@ public class DBConnector {
 		DBResult result = new DBResult();
 
 		try {
-			con=getConnection();
+			con = getConnection();
 			String selectStatement = "select ID from users where NAME=?";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setString(1, username);

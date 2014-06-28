@@ -28,14 +28,12 @@ public class SendReceiveMessage extends HttpServlet {
      */
     public SendReceiveMessage() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		
 		User user = MyServletUtil.checkLogin(request, response);
@@ -62,24 +60,16 @@ public class SendReceiveMessage extends HttpServlet {
 		User friend = null;
 		if(action == null) {
 			List<ChatMessage> messages = null;
-			try {
-				DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-				messages = dateDB.getConversation(user.getUid(), friendId);
-				friend = dateDB.getUser(friendId);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			messages = DBConnector.getConversation(user.getUid(), friendId);
+			friend = DBConnector.getUser(friendId);
+			
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);
 			getServletContext().getRequestDispatcher("/chat.jsp").forward(request, response);
 		} else if(action.equals("receive")) {
 			List<ChatMessage> messages = null;
-			try {
-				DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-				messages = dateDB.getNewMessagesFromFriend(user.getUid(), friendId);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			messages = DBConnector.getNewMessagesFromFriend(user.getUid(), friendId);
+			
 			JSONArray array = new JSONArray();
 			for(ChatMessage msg : messages) {
 				array.add(msg);
@@ -88,12 +78,7 @@ public class SendReceiveMessage extends HttpServlet {
 		} else if(action.equals("send")) {
 			String content = (String) request.getParameter("content");
 			List<ChatMessage> messages = null;
-			try {
-				DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-				messages = dateDB.sendMessage(user.getUid(), friendId, content);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			messages = DBConnector.sendMessage(user.getUid(), friendId, content);
 			JSONArray array = new JSONArray();
 			for(ChatMessage msg : messages) {
 				array.add(msg);
@@ -107,7 +92,6 @@ public class SendReceiveMessage extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

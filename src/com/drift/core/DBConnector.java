@@ -86,12 +86,12 @@ public class DBConnector {
 		
 	}
 
-	public Connection getConnection()throws Exception{
+	static public Connection getConnection()throws Exception{
 		//return java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
 		return ds.getConnection();
 	}
 
-	public void closeConnection(Connection con){
+	static public void closeConnection(Connection con){
 		try{
 			if(con!=null) con.close();
 		}catch(Exception e){
@@ -99,7 +99,7 @@ public class DBConnector {
 		}
 	}
 
-	public void closePrepStmt(PreparedStatement prepStmt){
+	static public void closePrepStmt(PreparedStatement prepStmt){
 		try{
 			if(prepStmt!=null) prepStmt.close();
 		}catch(Exception e){
@@ -107,7 +107,7 @@ public class DBConnector {
 		}
 	}
 
-	public void closeResultSet(ResultSet rs){
+	static public void closeResultSet(ResultSet rs){
 		try{
 			if(rs!=null) rs.close();
 		}catch(Exception e){
@@ -118,7 +118,7 @@ public class DBConnector {
 	/*
 	 * Check if username exists already
 	 */
-	public int checkUsername(String username) throws Exception {
+	static public int checkUsername(String username){
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -155,7 +155,7 @@ public class DBConnector {
 	 *	0:		succeed
 	 *	< 0:	error
 	 */
-	public DBResult register(String username,
+	static public DBResult register(String username,
 			String nickname,
 			String password,
 			String sex,
@@ -164,8 +164,7 @@ public class DBConnector {
 			String department,
 			String major,
 			String enrollYear,
-			String email
-			) throws Exception {
+			String email) {
 		Connection con = null;
 		PreparedStatement selectPrepStmt1 = null;
 		ResultSet selectRs1 = null;
@@ -271,7 +270,7 @@ public class DBConnector {
 		return result;
 	}
 
-	public String getActivationCode(String username, String password, String sex,
+	static public String getActivationCode(String username, String password, String sex,
 			String email, int uid, long ts) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(uid);
@@ -283,7 +282,7 @@ public class DBConnector {
 		return MD5Util.encode2hex(sb.toString());
 	}
 	
-	public int checkActivate(String email, String codeInput) {
+	static public int checkActivate(String email, String codeInput) {
 		int rtval = DB_STATUS_ERR_GENERIC;
 		Connection con = null;
 		PreparedStatement prepStmt = null;
@@ -332,11 +331,17 @@ public class DBConnector {
 		return rtval;
 	}
   
-	public DBResult login(String username, String password) throws Exception {
+	static public DBResult login(String username, String password) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
 		DBResult result = new DBResult();
+		
+		if(username == null || username.isEmpty() ||
+				password == null || password.isEmpty()) {
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
+		}
 
 		String email = null;
 		if(username != null && (username.indexOf('@') != -1)) {
@@ -451,14 +456,13 @@ public class DBConnector {
 	 *	0:	sql error
 	 *	1:	succeed
 	 */
-	public int editProfile(int uid,
+	static public int editProfile(int uid,
 			String nickname,
 			String birthday,	/* caller's repsonsibility to make sure it's format is '1990-01-01' */
 			String school,
 			String department,
 			String enrollYear,
-			String major
-			) throws Exception {
+			String major) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -500,7 +504,7 @@ public class DBConnector {
 	 *	0:	sql error
 	 *	1:	succeed
 	 */
-	public int postBottle(int uid, String content) throws Exception {
+	static public int postBottle(int uid, String content) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -536,7 +540,7 @@ public class DBConnector {
 	 * Return value:
 	 *	null: error
 	 */
-	public User getUser(int userId) throws Exception {
+	static public User getUser(int userId) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -585,7 +589,7 @@ public class DBConnector {
 	 * Return value:
 	 *	
 	 */
-	public int setPhoto(int uid, String filename) throws Exception {
+	static public int setPhoto(int uid, String filename) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -619,7 +623,7 @@ public class DBConnector {
 	 * Return value:
 	 *	
 	 */
-	public String getPhotoUrl(int uid) throws Exception {
+	static public String getPhotoUrl(int uid) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -659,7 +663,7 @@ public class DBConnector {
 	 * 	
 	 * TODO: This function should be synchronized
 	 */
-	public Bottle getBottle(int uid) throws Exception {
+	static public Bottle getBottle(int uid) {
 		Connection con = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
@@ -719,7 +723,7 @@ public class DBConnector {
 	}
 
 	// return value: sender ID
-	public int replyBottle(int uid, int bid)
+	static public int replyBottle(int uid, int bid)
 	{
 		Connection con = null;
 		PreparedStatement prepStmt = null;
@@ -773,7 +777,7 @@ public class DBConnector {
 		return rtval;
 	}
 	
-	public int setBottleUnread(int bid)
+	static public int setBottleUnread(int bid)
 	{
 		Connection con=null;
 		PreparedStatement prepStmt=null;
@@ -804,11 +808,11 @@ public class DBConnector {
 		return rtval;
 	}
 	
-	public List<ChatMessage> getMessages(int uid) {
+	static public List<ChatMessage> getMessages(int uid) {
 		return getMessages(uid, 0, 30);		
 	}
 	
-	public List<ChatMessage> getMessages(int uid, int start, int length)
+	static public List<ChatMessage> getMessages(int uid, int start, int length)
 	{
 		Connection con = null;
 		PreparedStatement prepStmt = null;
@@ -867,7 +871,7 @@ public class DBConnector {
 		return messages;
 	}
 	
-	public List<ChatMessage> getConversation(int uid, int friendId)
+	static public List<ChatMessage> getConversation(int uid, int friendId)
 	{
 		Connection con=null;
 		PreparedStatement prepStmt=null;
@@ -909,7 +913,7 @@ public class DBConnector {
 		return messages;
 	}
 	
-	public List<ChatMessage> getNewMessagesFromFriend(int uid, int friendId)
+	static public List<ChatMessage> getNewMessagesFromFriend(int uid, int friendId)
 	{
 		Connection con=null;
 		PreparedStatement prepStmt=null;
@@ -954,7 +958,7 @@ public class DBConnector {
 		return messages;
 	} 
 	
-	public int getNewMessageCount(int uid)
+	static public int getNewMessageCount(int uid)
 	{
 		Connection con=null;
 		PreparedStatement prepStmt=null;
@@ -985,7 +989,7 @@ public class DBConnector {
 		return result;
 	}
 	
-	public List<ChatMessage> sendMessage(int uid, int friendId, String content)
+	static public List<ChatMessage> sendMessage(int uid, int friendId, String content)
 	{
 		Connection con=null;
 		PreparedStatement prepStmt=null;

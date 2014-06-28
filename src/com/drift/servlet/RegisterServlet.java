@@ -22,7 +22,6 @@ public class RegisterServlet extends HttpServlet {
      */
     public RegisterServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
@@ -43,7 +42,6 @@ public class RegisterServlet extends HttpServlet {
 	}
 
 	private String doActivate(HttpServletRequest request) {
-		// TODO Auto-generated method stub
 		String page = MyServletUtil.activateJspPage;
 		
 		// Get all parameters
@@ -57,12 +55,7 @@ public class RegisterServlet extends HttpServlet {
 		}
 		
 		int result = DBConnector.DB_STATUS_ERR_GENERIC;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			result = dateDB.checkActivate(email, activateCode);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		result = DBConnector.checkActivate(email, activateCode);
 		
 		switch (result) {
 		case DBConnector.DB_STATUS_OK:
@@ -108,13 +101,8 @@ public class RegisterServlet extends HttpServlet {
 		}
 		
 		DBResult result = null;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			result = dateDB.register(username, nickname, password, sex, birthday, school, 
-						department, major, enrollYear, email);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		result = DBConnector.register(username, nickname, password, sex, birthday, school, 
+					department, major, enrollYear, email);
 		
 		switch (result.getCode()) {
 		case DBConnector.DB_STATUS_OK:
@@ -142,7 +130,6 @@ public class RegisterServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

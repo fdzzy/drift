@@ -31,14 +31,12 @@ public class UpdateStateServlet extends HttpServlet {
     public UpdateStateServlet() {
         super();
         //onlineUsers = new HashSet<User>();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		
 		User user = MyServletUtil.checkLogin(request, response);
@@ -48,12 +46,8 @@ public class UpdateStateServlet extends HttpServlet {
 		
 		//onlineUsers.add(user);
 		int messageCount = 0;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			messageCount = dateDB.getNewMessageCount(user.getUid());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		messageCount = DBConnector.getNewMessageCount(user.getUid());
+		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("newMessageCount", messageCount);
 		JSONObject obj = new JSONObject(map);
@@ -65,7 +59,6 @@ public class UpdateStateServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

@@ -23,14 +23,12 @@ public class GetBottleServlet extends HttpServlet {
      */
     public GetBottleServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		
 		User user = MyServletUtil.checkLogin(request, response);
@@ -39,12 +37,8 @@ public class GetBottleServlet extends HttpServlet {
 		}
 		
 		Bottle bottle = null;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			bottle = dateDB.getBottle(user.getUid());
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		bottle = DBConnector.getBottle(user.getUid());
+		
 		request.setAttribute("user", user);
 		request.setAttribute("bottle", bottle);
 		getServletContext().getRequestDispatcher(MyServletUtil.getBottleJspPage).forward(request, response);
@@ -54,7 +48,6 @@ public class GetBottleServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

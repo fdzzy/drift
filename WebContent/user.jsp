@@ -21,12 +21,9 @@ int id = Integer.parseInt(request.getParameter("id"));
 
 int rtval = 0;
 String photoUrl = "";
-try {
-	targetUser = dateDB.getUser(id);
-	photoUrl = dateDB.getPhotoUrl(id);
-}catch(Exception e) {
-	e.printStackTrace();
-}
+targetUser = DBConnector.getUser(id);
+photoUrl = DBConnector.getPhotoUrl(id);
+
 if(targetUser == null) {
 	out.println("请稍后重试！");
 %>

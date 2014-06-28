@@ -199,14 +199,8 @@ if(messages == null || friend == null) {
 	return;
 }
 
-String friendPhotoUrl = null;
-String myPhotoUrl = null;
-try {
-	friendPhotoUrl = dateDB.getPhotoUrl(friend.getUid());
-	myPhotoUrl = dateDB.getPhotoUrl(user.getUid());
-} catch (Exception e) {
-	e.printStackTrace();
-}
+String friendPhotoUrl = DBConnector.getPhotoUrl(friend.getUid()); 
+String myPhotoUrl = DBConnector.getPhotoUrl(user.getUid());
 
 %>
 

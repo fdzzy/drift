@@ -23,14 +23,12 @@ public class EditProfileServlet extends HttpServlet {
      */
     public EditProfileServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		
 		User user = MyServletUtil.checkLogin(request, response);
@@ -45,19 +43,13 @@ public class EditProfileServlet extends HttpServlet {
 				doEdit(request,response,uid);				
 			}
 		}
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			String photoUrl = dateDB.getPhotoUrl(uid);
-			request.setAttribute("photoUrl",photoUrl);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+		
+		String photoUrl = DBConnector.getPhotoUrl(uid);
+		request.setAttribute("photoUrl",photoUrl);
 		getServletContext().getRequestDispatcher("/edit_profile.jsp").forward(request, response);
 	}
 
 	private void doEdit(HttpServletRequest request, HttpServletResponse response, int uid) {
-		// TODO Auto-generated method stub		
 		
 		String nickname = request.getParameter("nickname");
 		String birthday = request.getParameter("birthday");		//example: '1990-01-01'
@@ -75,18 +67,13 @@ public class EditProfileServlet extends HttpServlet {
 		}
 		
 		int rtval = DBConnector.DB_STATUS_ERR_GENERIC;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			rtval = dateDB.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
-			if(rtval == DBConnector.DB_STATUS_OK) {
-				String msg = "<center><p><font color='green'>修改成功！</font></p></center>";
-				request.setAttribute("msg",msg);
-			} else {
-				String msg = "<center><p><font color='red'>修改失败！</font></p></center>";
-				request.setAttribute("msg",msg);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		rtval = DBConnector.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
+		if(rtval == DBConnector.DB_STATUS_OK) {
+			String msg = "<center><p><font color='green'>修改成功！</font></p></center>";
+			request.setAttribute("msg",msg);
+		} else {
+			String msg = "<center><p><font color='red'>修改失败！</font></p></center>";
+			request.setAttribute("msg",msg);
 		}
 	}
 	
@@ -94,7 +81,6 @@ public class EditProfileServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

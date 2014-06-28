@@ -23,14 +23,12 @@ public class PostBottleServlet extends HttpServlet {
      */
     public PostBottleServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		
 		User user = MyServletUtil.checkLogin(request, response);
@@ -42,12 +40,8 @@ public class PostBottleServlet extends HttpServlet {
 		System.out.println("\"" + user.getUsername() + "\"" + "发送了消息：\"" + content + "\"");
 		
 		int rtval = 0;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			rtval = dateDB.postBottle(user.getUid(), content);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		rtval = DBConnector.postBottle(user.getUid(), content);
+		
 		String msg;
 		switch (rtval) {
 		case DBConnector.DB_STATUS_OK:
@@ -67,7 +61,6 @@ public class PostBottleServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

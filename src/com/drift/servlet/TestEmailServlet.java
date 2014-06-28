@@ -21,14 +21,12 @@ public class TestEmailServlet extends HttpServlet {
      */
     public TestEmailServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		String action = request.getParameter("action");
 		if(action!=null && action.equals("send")) {
@@ -38,7 +36,6 @@ public class TestEmailServlet extends HttpServlet {
 			try {
 				SendEmail.send(toEmail, subject, content);
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
 			}
 			request.setAttribute("msg", "发送成功");
@@ -50,7 +47,6 @@ public class TestEmailServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

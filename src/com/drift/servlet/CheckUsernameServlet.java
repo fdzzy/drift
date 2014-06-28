@@ -23,14 +23,13 @@ public class CheckUsernameServlet extends HttpServlet {
      */
     public CheckUsernameServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		
 		MyServletUtil.setCharacterEncoding(request, response);
 		String username = request.getParameter("username");
 		System.out.println(username);
@@ -42,12 +41,7 @@ public class CheckUsernameServlet extends HttpServlet {
 		}		
 		
 		int result = DBConnector.DB_STATUS_ERR_GENERIC;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			result = dateDB.checkUsername(username);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		result = DBConnector.checkUsername(username);
 		
 		if(result == DBConnector.DB_STATUS_OK) {
 			out.print("true");
@@ -60,7 +54,6 @@ public class CheckUsernameServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

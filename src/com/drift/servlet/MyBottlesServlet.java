@@ -26,14 +26,12 @@ public class MyBottlesServlet extends HttpServlet {
      */
     public MyBottlesServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		
 		User user = MyServletUtil.checkLogin(request, response);
@@ -43,12 +41,7 @@ public class MyBottlesServlet extends HttpServlet {
 		
 		//Set<User> friends = null;
 		List<ChatMessage> messages = null;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			messages = dateDB.getMessages(user.getUid(), 0, 30);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		messages = DBConnector.getMessages(user.getUid(), 0, 30);
 		
 		if(messages != null && !messages.isEmpty()) {
 			request.setAttribute("messages", messages);
@@ -67,7 +60,6 @@ public class MyBottlesServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

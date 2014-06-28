@@ -74,9 +74,10 @@ setInterval(updateState, 10000);
 		int senderId = message.getSenderId();
 		int receiverId = message.getReceiverId();
 		int friendId = (receiverId == user.getUid()) ? senderId : receiverId;
-		User friend = dateDB.getUser(friendId);
+		User friend = DBConnector.getUser(friendId);
+		String photoUrl = DBConnector.getPhotoUrl(friendId);
 		out.println("<tr>");
-		out.println("<td><a href='user.jsp?id=" + friendId + "'><img src=" + dateDB.getPhotoUrl(friendId) + " height='30' width='30'/>" 
+		out.println("<td><a href='user.jsp?id=" + friendId + "'><img src=" + photoUrl + " height='30' width='30'/>" 
 			+ friend.getUsername()  + "</a></td>");
 		out.println("<td>" + sdf.format(message.getTs()) + "</td>");
 		String content = message.getContent();

@@ -23,14 +23,12 @@ public class LoginServlet extends HttpServlet {
      */
     public LoginServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);	
 		String action = request.getParameter("action");
 		String page = MyServletUtil.loginJspPage;
@@ -43,19 +41,12 @@ public class LoginServlet extends HttpServlet {
 	}
 
 	private String doLogin(HttpServletRequest request) {
-		// TODO Auto-generated method stub
 		String page = MyServletUtil.loginJspPage;
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		DBResult result = null;
 		
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			result = dateDB.login(username, password);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		result = DBConnector.login(username, password);
 		
 		switch (result.getCode()) {
 		case DBConnector.DB_STATUS_OK:
@@ -90,7 +81,6 @@ public class LoginServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

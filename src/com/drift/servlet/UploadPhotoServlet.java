@@ -61,8 +61,6 @@ public class UploadPhotoServlet extends HttpServlet {
 			tempPathFile.mkdirs();
 		}
 		try {
-			DBConnector dateDb = MyServletUtil.getDateDB(getServletContext());
-			
 			// Create a factory for disk-based file items
 			DiskFileItemFactory factory = new DiskFileItemFactory();
 
@@ -100,7 +98,8 @@ public class UploadPhotoServlet extends HttpServlet {
 					//System.out.println(newFileName);
 					File savedFile = new File(userpath, newFileName);
 					fi.write(savedFile);
-					dbStatus = dateDb.setPhoto(uid, newFileName);
+					dbStatus = DBConnector.setPhoto(uid, newFileName);
+					
 					FileUtil.limitFiles(uploadPath);
 				}
 			}
@@ -117,7 +116,6 @@ public class UploadPhotoServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

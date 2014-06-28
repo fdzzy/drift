@@ -27,12 +27,8 @@ if(user == null && bottle == null) {
 	return;
 }
 int senderUid = bottle.getSenderId();
-String photoUrl = null;
-try {
-	photoUrl = dateDB.getPhotoUrl(senderUid);
-} catch (Exception e) {
-	e.printStackTrace();
-}
+String photoUrl = DBConnector.getPhotoUrl(senderUid);
+
 %>
 
 <form action="do_post.jsp" method="post" onsubmit='return checkinfo(this)'>

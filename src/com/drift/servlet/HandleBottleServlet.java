@@ -25,14 +25,12 @@ public class HandleBottleServlet extends HttpServlet {
      */
     public HandleBottleServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		MyServletUtil.setCharacterEncoding(request, response);
 		User user = MyServletUtil.checkLogin(request, response);
 		if(user == null) {
@@ -62,24 +60,14 @@ public class HandleBottleServlet extends HttpServlet {
 			HttpServletResponse response, int uid, int bottleId) throws ServletException,
 			IOException {			
 		int senderID = DBConnector.DB_STATUS_ERR_GENERIC;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			senderID = dateDB.replyBottle(uid, bottleId);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+		
+		senderID = DBConnector.replyBottle(uid, bottleId);
 		if(senderID > 0) {
 			//System.out.println(senderID);
 			List<ChatMessage> messages = null;
 			User friend = null;
-			try {
-				DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-				messages = dateDB.getConversation(uid, senderID);
-				friend = dateDB.getUser(senderID);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			messages = DBConnector.getConversation(uid, senderID);
+			friend = DBConnector.getUser(senderID);
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);
 			getServletContext().getRequestDispatcher("/chat.jsp").forward(request, response);
@@ -91,13 +79,7 @@ public class HandleBottleServlet extends HttpServlet {
 			HttpServletResponse response, int bottleId) throws ServletException,
 			IOException {			
 		int result = DBConnector.DB_STATUS_ERR_GENERIC;
-		try {
-			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			result = dateDB.setBottleUnread(bottleId);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+		result = DBConnector.setBottleUnread(bottleId);
 		if(result == DBConnector.DB_STATUS_OK) {
 			getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
 		}
@@ -108,7 +90,6 @@ public class HandleBottleServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

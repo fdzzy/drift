@@ -23,6 +23,55 @@ public final class MyServletUtil {
 	public static final String getBottleJspPage = "/get_bottle.jsp";
 	public static final String doPostBottleJspPage = "/do_post.jsp";
 	
+	public static final int API_STATUS_CODE_SUCCEED = 10000;
+	public static final int API_STATUS_CODE_ERR_UNKONW = 10001;
+	public static final int API_STATUS_CODE_BAD_ARGS = 10002;
+	public static final int API_STATUS_CODE_USER_NOT_EXIST = 10003;
+	public static final int API_STATUS_CODE_ERR_PASSWORD = 10004;
+	public static final int API_STATUS_CODE_EMAIL_NOT_EXIST = 10005;
+	public static final int API_STATUS_CODE_USER_NOT_ACTIVATED = 10006;
+	
+	public static final String[] API_STATUS_CODE_MESSAGES = {
+		"Success",
+		"Unknown Error",
+		"Bad Arguments",
+		"User name has not been registered",
+		"Wrong Password",
+		"Email has not been registered",
+		"User has not yet activated"		
+	};
+	
+	public static int convertStatusCode(int db_code) {		
+		int code;
+		
+		switch (db_code) {
+		case DBConnector.DB_STATUS_OK:
+			code = API_STATUS_CODE_SUCCEED;
+			break;
+		case DBConnector.DB_STATUS_ERR_BAD_ARGS:
+			code = API_STATUS_CODE_BAD_ARGS;
+			break;
+		case DBConnector.DB_STATUS_ERR_PASSWORD:
+			code = API_STATUS_CODE_ERR_PASSWORD;
+			break;
+		case DBConnector.DB_STATUS_ERR_USER_NOT_EXIST:
+			code = API_STATUS_CODE_USER_NOT_EXIST;
+			break;
+		case DBConnector.DB_STATUS_ERR_EMAIL_NOT_EXIST:
+			code = API_STATUS_CODE_EMAIL_NOT_EXIST;
+			break;
+		default:
+			code = API_STATUS_CODE_ERR_UNKONW;
+			break;
+		}
+		
+		return code;
+	}
+	
+	public static String getStatusMessage(int status) {
+		return API_STATUS_CODE_MESSAGES[status - MyServletUtil.API_STATUS_CODE_SUCCEED];
+	}
+	
 	//public static final String entryURL = "http://driftlove.duapp.com";
 	public static final String entryURL = "http://localhost:8080/drift";
 	

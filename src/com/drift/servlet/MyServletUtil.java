@@ -23,8 +23,8 @@ public final class MyServletUtil {
 	public static final String getBottleJspPage = "/get_bottle.jsp";
 	public static final String doPostBottleJspPage = "/do_post.jsp";
 	
-	public static final String entryURL = "http://driftlove.duapp.com";
-	//public static final String entryURL = "http://localhost:8080/drift";
+	//public static final String entryURL = "http://driftlove.duapp.com";
+	public static final String entryURL = "http://localhost:8080/drift";
 	
 	// SESSION Variable Constants
 	public static final String SESS_UID = "userId";			// Deprecated

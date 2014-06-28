@@ -3,8 +3,6 @@ package com.drift.servlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,7 +11,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -36,7 +33,6 @@ public class UploadPhotoServlet extends HttpServlet {
      */
     public UploadPhotoServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
     
 	/**
@@ -104,8 +100,7 @@ public class UploadPhotoServlet extends HttpServlet {
 					//System.out.println(newFileName);
 					File savedFile = new File(userpath, newFileName);
 					fi.write(savedFile);
-					dbStatus = dateDb.set_photo(uid, newFileName);
-					// TODO: Limit the file count that user uploads
+					dbStatus = dateDb.setPhoto(uid, newFileName);
 					FileUtil.limitFiles(uploadPath);
 				}
 			}

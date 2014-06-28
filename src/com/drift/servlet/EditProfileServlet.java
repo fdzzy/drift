@@ -48,7 +48,7 @@ public class EditProfileServlet extends HttpServlet {
 		}
 		try {
 			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			String photoUrl = dateDB.get_photo_url(uid);
+			String photoUrl = dateDB.getPhotoUrl(uid);
 			request.setAttribute("photoUrl",photoUrl);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -78,7 +78,7 @@ public class EditProfileServlet extends HttpServlet {
 		int rtval = DBConnector.DB_STATUS_ERR_GENERIC;
 		try {
 			DBConnector dateDB = MyServletUtil.getDateDB(getServletContext());
-			rtval = dateDB.edit_profile(uid, nickname, birthday, school, department, enrollYear, major);
+			rtval = dateDB.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
 			if(rtval == DBConnector.DB_STATUS_OK) {
 				String msg = "<center><p><font color='green'>修改成功！</font></p></center>";
 				request.setAttribute("msg",msg);

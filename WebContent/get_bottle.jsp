@@ -29,7 +29,7 @@ if(user == null && bottle == null) {
 int senderUid = bottle.getSenderId();
 String photoUrl = null;
 try {
-	photoUrl = dateDB.get_photo_url(senderUid);
+	photoUrl = dateDB.getPhotoUrl(senderUid);
 } catch (Exception e) {
 	e.printStackTrace();
 }

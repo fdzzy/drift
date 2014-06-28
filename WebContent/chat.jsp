@@ -202,8 +202,8 @@ if(messages == null || friend == null) {
 String friendPhotoUrl = null;
 String myPhotoUrl = null;
 try {
-	friendPhotoUrl = dateDB.get_photo_url(friend.getUid());
-	myPhotoUrl = dateDB.get_photo_url(user.getUid());
+	friendPhotoUrl = dateDB.getPhotoUrl(friend.getUid());
+	myPhotoUrl = dateDB.getPhotoUrl(user.getUid());
 } catch (Exception e) {
 	e.printStackTrace();
 }

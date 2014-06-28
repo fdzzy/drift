@@ -1,9 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
 <Context  reloadable="true" >
 	<Resource name="jdbc/DateDB" auth="Container" type="javax.sql.DataSource"
 		maxActive="1000" maxIdle="30" maxWait="10000"
 		username="dbuser" password="1234"
 		driverClassName="com.mysql.jdbc.Driver"
-		url="jdbc:mysql://localhost:3306/DateDB?useUnicode=yes&amp;characterEncoding=utf-8" />
+		url="jdbc:mysql://localhost:3306/DateDB?autoReconnect=true&amp;useUnicode=yes&amp;characterEncoding=utf-8" />
 		/>
 </Context>		
  

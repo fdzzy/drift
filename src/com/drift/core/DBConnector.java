@@ -168,30 +168,36 @@ public class DBConnector {
 			String enrollYear,
 			String email
 			) throws Exception {
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
+		Connection con = null;
+		PreparedStatement selectPrepStmt1 = null;
+		ResultSet selectRs1 = null;
+		PreparedStatement selectPrepStmt2 = null;
+		ResultSet selectRs2 = null;
+		PreparedStatement insertPrepStmt = null;
+		PreparedStatement selectPrepStmt3 = null;
+		ResultSet selectRs3 = null;
+		
 		DBResult result = new DBResult();
 
 		try {
 			con = getConnection();
 			String selectStatement = "select ID from users where NAME=?";
-			prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setString(1, username);
-			rs = prepStmt.executeQuery();
+			selectPrepStmt1 = con.prepareStatement(selectStatement);
+			selectPrepStmt1.setString(1, username);
+			selectRs1 = selectPrepStmt1.executeQuery();
 
-			if (rs.next()) {
+			if (selectRs1.next()) {
 				//user name exists in DB already
 				result.setCode(DB_STATUS_ERR_USER_EXISTS);
 				return result;
 			} 
 
 			selectStatement = "select ID from users where EMAIL=?";
-			prepStmt.setString(1, email);
-			prepStmt = con.prepareStatement(selectStatement);
-			rs = prepStmt.executeQuery();
+			selectPrepStmt2 = con.prepareStatement(selectStatement);
+			selectPrepStmt2.setString(1, email);
+			selectRs2 = selectPrepStmt2.executeQuery();
 
-			if(rs.next()) {
+			if(selectRs2.next()) {
 				//email exists in DB already
 				result.setCode(DB_STATUS_ERR_EMAIL_EXISTS);
 				return result;
@@ -205,28 +211,28 @@ public class DBConnector {
 					"SCHOOL, DEPARTMENT, MAJOR, ENROLLYEAR, EMAIL, REGISTER_TIME) values " + 
 					"(?,?,?,?,?,?,?,?,?,?,NOW())";
 			//System.out.println("Register: INSERT SQL String: " + insertStatement);
-			prepStmt = con.prepareStatement(insertStatement);
-			prepStmt.setString(1, username);
-			prepStmt.setString(2, nickname);
-			prepStmt.setString(3, password);
-			prepStmt.setString(4, sex);
-			prepStmt.setString(5, birthday);
-			prepStmt.setString(6, school);
-			prepStmt.setString(7, department);
-			prepStmt.setString(8, major);
-			prepStmt.setString(9, enrollYear);
-			prepStmt.setString(10, email);			
+			insertPrepStmt = con.prepareStatement(insertStatement);
+			insertPrepStmt.setString(1, username);
+			insertPrepStmt.setString(2, nickname);
+			insertPrepStmt.setString(3, password);
+			insertPrepStmt.setString(4, sex);
+			insertPrepStmt.setString(5, birthday);
+			insertPrepStmt.setString(6, school);
+			insertPrepStmt.setString(7, department);
+			insertPrepStmt.setString(8, major);
+			insertPrepStmt.setString(9, enrollYear);
+			insertPrepStmt.setString(10, email);			
 
-			if(prepStmt.executeUpdate() != 0) {
+			if(insertPrepStmt.executeUpdate() != 0) {
 				//sendRegisterEmail(email);
 				selectStatement = "select ID, REGISTER_TIME from users where NAME=?";
-				prepStmt = con.prepareStatement(selectStatement);
-				prepStmt.setString(1, username);
-				rs = prepStmt.executeQuery();
+				selectPrepStmt3 = con.prepareStatement(selectStatement);
+				selectPrepStmt3.setString(1, username);
+				selectRs3 = selectPrepStmt3.executeQuery();
 
-				if(rs.next()) {
-					int uid = rs.getInt(1);
-					java.sql.Timestamp timestamp2 = rs.getTimestamp(2);
+				if(selectRs3.next()) {
+					int uid = selectRs3.getInt(1);
+					java.sql.Timestamp timestamp2 = selectRs3.getTimestamp(2);
 					long ts = timestamp2.getTime();
 					String activationCode = getActivationCode(username, password, sex, email, uid, ts);
 
@@ -254,8 +260,13 @@ public class DBConnector {
 		} catch (Exception e) {
 			e.printStackTrace(); 
 		}finally{
-			closeResultSet(rs);
-			closePrepStmt(prepStmt);
+			closeResultSet(selectRs3);
+			closeResultSet(selectRs2);
+			closeResultSet(selectRs1);
+			closePrepStmt(selectPrepStmt3);
+			closePrepStmt(selectPrepStmt2);
+			closePrepStmt(selectPrepStmt1);
+			closePrepStmt(insertPrepStmt);
 			closeConnection(con);
 		}
 
@@ -278,6 +289,7 @@ public class DBConnector {
 		int rtval = DB_STATUS_ERR_GENERIC;
 		Connection con = null;
 		PreparedStatement prepStmt = null;
+		PreparedStatement updatePrepStmt = null;
 		ResultSet rs = null;
 		
 		try {
@@ -303,9 +315,9 @@ public class DBConnector {
 					// Update this ACTIVATED code in Database
 					String updateStatement = "UPDATE `users` SET `ACTIVATED`=1 WHERE `ID`=?"; 
 					//System.out.println("edit: UPDATE SQL String: " + updateStatement);
-					prepStmt = con.prepareStatement(updateStatement);
-					prepStmt.setInt(1, uid);
-					if(prepStmt.executeUpdate() != 0) {
+					updatePrepStmt = con.prepareStatement(updateStatement);
+					updatePrepStmt.setInt(1, uid);
+					if(updatePrepStmt.executeUpdate() != 0) {
 						rtval = DB_STATUS_OK;
 					}
 				}
@@ -315,6 +327,7 @@ public class DBConnector {
 		}finally{
 			closeResultSet(rs);
 			closePrepStmt(prepStmt);
+			closePrepStmt(updatePrepStmt);
 			closeConnection(con);
 		}		
 		
@@ -403,7 +416,7 @@ public class DBConnector {
 	 *     0: other error
 	 * 	-1:	user does not exist
 	 */
-	public int get_user_id(String username) throws Exception {
+	/*public int get_user_id(String username) throws Exception {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -431,7 +444,7 @@ public class DBConnector {
 			closeConnection(con);
 		}
 		return rtval;
-	}
+	}*/
 
 
 	/* 
@@ -440,7 +453,7 @@ public class DBConnector {
 	 *	0:	sql error
 	 *	1:	succeed
 	 */
-	public int edit_profile(int uid,
+	public int editProfile(int uid,
 			String nickname,
 			String birthday,	/* caller's repsonsibility to make sure it's format is '1990-01-01' */
 			String school,
@@ -480,7 +493,6 @@ public class DBConnector {
 		}
 		return rtval;
 	}
-
 
 	/* Post a bottle into the DB
 	 * Args: username, content
@@ -575,7 +587,7 @@ public class DBConnector {
 	 * Return value:
 	 *	
 	 */
-	public int set_photo(int uid, String filename) throws Exception {
+	public int setPhoto(int uid, String filename) throws Exception {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -585,7 +597,7 @@ public class DBConnector {
 			con=getConnection();
 			// Update photo filename in Database
 			String updateStatement = "UPDATE `users` SET `PHOTO`=? WHERE `ID`=?"; 
-			//System.out.println("set photo: UPDATE SQL String: " + updateStatement);
+			System.out.println("set photo: UPDATE SQL String: " + updateStatement);
 			prepStmt = con.prepareStatement(updateStatement);
 			prepStmt.setString(1, filename);
 			prepStmt.setInt(2, uid);
@@ -609,7 +621,7 @@ public class DBConnector {
 	 * Return value:
 	 *	
 	 */
-	public String get_photo_url(int uid) throws Exception {
+	public String getPhotoUrl(int uid) throws Exception {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
@@ -650,9 +662,12 @@ public class DBConnector {
 	 * TODO: This function should be synchronized
 	 */
 	public Bottle getBottle(int uid) throws Exception {
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
+		Connection con = null;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = null;
+		PreparedStatement prepStmt2 = null;
+		ResultSet rs2 = null;
+		PreparedStatement updatePrepStmt = null;
 		String sex = null;
 		Bottle bottle = null;
 		
@@ -673,19 +688,19 @@ public class DBConnector {
 				sex = sex.equals("male") ? "female" : "male";
 				selectStatement = "select users.name, bottles.id, bottles.sender, bottles.content from bottles, users "
 						+ "where bottles.sender=users.id and users.sex=? and bottles.receiver=0 order by rand() limit 1";
-				prepStmt = con.prepareStatement(selectStatement);
-				prepStmt.setString(1, sex);
-				rs = prepStmt.executeQuery();
-				if(rs.next()) {
-					String senderName = rs.getString(1);
-					int bottleId = rs.getInt(2);
-					int senderId= rs.getInt(3);
-					String content = rs.getString(4);
+				prepStmt2 = con.prepareStatement(selectStatement);
+				prepStmt2.setString(1, sex);
+				rs2 = prepStmt2.executeQuery();
+				if(rs2.next()) {
+					String senderName = rs2.getString(1);
+					int bottleId = rs2.getInt(2);
+					int senderId= rs2.getInt(3);
+					String content = rs2.getString(4);
 					String updateStatement = "UPDATE `bottles` SET `receiver`=? WHERE `ID`=?"; 
-					prepStmt = con.prepareStatement(updateStatement);
-					prepStmt.setInt(1, uid);
-					prepStmt.setInt(2, bottleId);
-					if(prepStmt.executeUpdate() != 0) {
+					updatePrepStmt = con.prepareStatement(updateStatement);
+					updatePrepStmt.setInt(1, uid);
+					updatePrepStmt.setInt(2, bottleId);
+					if(updatePrepStmt.executeUpdate() != 0) {
 						bottle = new Bottle(bottleId, senderId, senderName, content);
 					}
 				}
@@ -695,8 +710,11 @@ public class DBConnector {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
+			closeResultSet(rs2);
 			closeResultSet(rs);
+			closePrepStmt(prepStmt2);
 			closePrepStmt(prepStmt);
+			closePrepStmt(updatePrepStmt);
 			closeConnection(con);
 		}
 		return bottle;
@@ -705,9 +723,11 @@ public class DBConnector {
 	// return value: sender ID
 	public int replyBottle(int uid, int bid)
 	{
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
+		Connection con = null;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = null;
+		PreparedStatement insertPrepStmt = null;
+		
 		int rtval = DB_STATUS_ERR_GENERIC;
 		
 		if(uid <= 0 || bid <= 0) {
@@ -715,7 +735,7 @@ public class DBConnector {
 		}
 
 		try {
-			con=getConnection();
+			con = getConnection();
 			String selectStatement = "select sender, sendtime, content from bottles where ID=?";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setInt(1, bid);
@@ -729,14 +749,14 @@ public class DBConnector {
 				String insertStatement = "insert into messages (senderID, receiverID, sendTime, readFlag, content)" 
 						+ " values (?,?,?,?,?)";
 				//System.out.println(insertStatement);
-				prepStmt = con.prepareStatement(insertStatement);
-				prepStmt.setInt(1, senderId);
-				prepStmt.setInt(2, uid);
-				prepStmt.setTimestamp(3, ts);
-				prepStmt.setInt(4, 1);
-				prepStmt.setString(5, content);
+				insertPrepStmt = con.prepareStatement(insertStatement);
+				insertPrepStmt.setInt(1, senderId);
+				insertPrepStmt.setInt(2, uid);
+				insertPrepStmt.setTimestamp(3, ts);
+				insertPrepStmt.setInt(4, 1);
+				insertPrepStmt.setString(5, content);
 				System.out.println(senderId + " " + uid + " " + ts + " " + content);
-				if(prepStmt.executeUpdate() != 0) {
+				if(insertPrepStmt.executeUpdate() != 0) {
 					rtval = senderId;
 				} else {
 					rtval = DB_STATUS_ERR_SQL;
@@ -749,6 +769,7 @@ public class DBConnector {
 		}finally{
 			closeResultSet(rs);
 			closePrepStmt(prepStmt);
+			closePrepStmt(insertPrepStmt);
 			closeConnection(con);
 		}
 		return rtval;
@@ -766,7 +787,7 @@ public class DBConnector {
 		}
 
 		try {
-			con=getConnection();
+			con = getConnection();
 			String updateStatement = "UPDATE `bottles` SET `receiver`=0 WHERE `ID`=?"; 
 			prepStmt = con.prepareStatement(updateStatement);
 			prepStmt.setInt(1, bid);
@@ -791,9 +812,10 @@ public class DBConnector {
 	
 	public List<ChatMessage> getMessages(int uid, int start, int length)
 	{
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
+		Connection con = null;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = null;
+		PreparedStatement updatePrepStmt = null;
 		//Set<User> friends = new TreeSet<User>();
 		List<ChatMessage> messages = new ArrayList<ChatMessage>();
 		
@@ -802,7 +824,7 @@ public class DBConnector {
 		}
 
 		try {
-			con=getConnection();
+			con = getConnection();
 			/*String selectStatement = "select ID, senderID, sendTime, content from messages where ID in " + 
 					"(select max(ID) from messages where receiverID=" + uid + " group by senderID)"
 					+ " order by sendTime DESC limit " + start + "," + length;*/
@@ -831,9 +853,9 @@ public class DBConnector {
 				messages.add(message);
 			}
 			String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `receiverID`=?"; 
-			prepStmt = con.prepareStatement(updateStatement);
-			prepStmt.setInt(1, uid);
-			if(prepStmt.executeUpdate() != 0) {
+			updatePrepStmt = con.prepareStatement(updateStatement);
+			updatePrepStmt.setInt(1, uid);
+			if(updatePrepStmt.executeUpdate() != 0) {
 				// anything to do?
 			}
 		} catch (Exception e) {
@@ -841,6 +863,7 @@ public class DBConnector {
 		}finally{
 			closeResultSet(rs);
 			closePrepStmt(prepStmt);
+			closePrepStmt(updatePrepStmt);
 			closeConnection(con);
 		}
 		return messages;

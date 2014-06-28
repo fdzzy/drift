@@ -23,7 +23,7 @@ int rtval = 0;
 String photoUrl = "";
 try {
 	targetUser = dateDB.getUser(id);
-	photoUrl = dateDB.get_photo_url(id);
+	photoUrl = dateDB.getPhotoUrl(id);
 }catch(Exception e) {
 	e.printStackTrace();
 }

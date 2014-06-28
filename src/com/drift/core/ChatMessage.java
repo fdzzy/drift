@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
@@ -75,13 +77,21 @@ public class ChatMessage implements Serializable, JSONAware {
 
 	@Override
 	public String toJSONString() {
-		// TODO Auto-generated method stub
 		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		JSONObject obj = new JSONObject();
-		obj.put("senderId", senderId);
-		obj.put("receiverId", receiverId);
-		obj.put("content", content);
-		obj.put("ts", sdf.format(ts));
+		//JSONObject obj = new JSONObject();
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.put("senderId", senderId);
+		map.put("receiverId", receiverId);
+		map.put("content", content);
+		map.put("ts", sdf.format(ts));
+		
+		JSONObject obj = new JSONObject(map);
+		
+		//obj.put("senderId", senderId);
+		//obj.put("receiverId", receiverId);
+		//obj.put("content", content);
+		//obj.put("ts", sdf.format(ts));
 		return obj.toJSONString();
 	}
 

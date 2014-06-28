@@ -73,7 +73,6 @@ public class DBConnector {
 		try {
 			ctx = new InitialContext();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new ExceptionInInitializerError("No Context");		
 		}			
@@ -81,7 +80,6 @@ public class DBConnector {
 		try {
 			ds = (DataSource) ctx.lookup("java:comp/env/jdbc/DateDB");
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new ExceptionInInitializerError("Data source look up failure!");	
 		}

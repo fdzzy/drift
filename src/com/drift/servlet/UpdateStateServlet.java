@@ -2,9 +2,8 @@ package com.drift.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -55,8 +54,9 @@ public class UpdateStateServlet extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		JSONObject obj = new JSONObject();
-		obj.put("newMessageCount", messageCount);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("newMessageCount", messageCount);
+		JSONObject obj = new JSONObject(map);
 		PrintWriter out = response.getWriter();
 		out.print(obj);
 	}

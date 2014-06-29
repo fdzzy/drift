@@ -175,6 +175,14 @@ public class DBConnector {
 		ResultSet selectRs3 = null;
 		
 		DBResult result = new DBResult();
+		
+		if(username == null || username.isEmpty() ||
+			password == null || password.isEmpty() ||
+			email == null || email.isEmpty() ||
+			sex == null || (!sex.equals("male") && !sex.equals("female"))) {
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
+		}
 
 		try {
 			con = getConnection();
@@ -467,7 +475,15 @@ public class DBConnector {
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
 		int rtval = DB_STATUS_ERR_GENERIC;
+		
+		if(uid <= 0) {
+			return DB_STATUS_ERR_BAD_ARGS;
+		}
 
+		if(birthday == null || birthday.isEmpty()) {
+			birthday = "1990-01-01";
+		}
+		
 		try {
 			con=getConnection();
 			String updateStatement = "UPDATE `users` SET `BIRTHDAY`=?,`SCHOOL`=?,`DEPARTMENT`=?," +
@@ -628,6 +644,10 @@ public class DBConnector {
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
 		String url = null;
+		
+		if(uid <= 0) {
+			return null;
+		}
 
 		try {
 			con=getConnection();
@@ -808,11 +828,14 @@ public class DBConnector {
 		return rtval;
 	}
 	
-	static public List<ChatMessage> getMessages(int uid) {
-		return getMessages(uid, 0, 30);		
-	}
-	
-	static public List<ChatMessage> getMessages(int uid, int start, int length)
+	/*
+	 * getMyBottels
+	 * 
+	 * Get a list of friends that the specific user had conversation to,
+	 * Also get the latest message with that friend
+	 * 
+	 */
+	static public List<ChatMessage> getMyBottles(int uid, int start, int length)
 	{
 		Connection con = null;
 		PreparedStatement prepStmt = null;
@@ -871,14 +894,20 @@ public class DBConnector {
 		return messages;
 	}
 	
+	/*
+	 * getConversation
+	 * 
+	 * Get the messages with the specific friend, and set readFlag to 1
+	 */
 	static public List<ChatMessage> getConversation(int uid, int friendId)
 	{
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
+		Connection con = null;
+		PreparedStatement prepStmt = null;
+		PreparedStatement updatePrepStmt = null;
+		ResultSet rs = null;
 		List<ChatMessage> messages = new ArrayList<ChatMessage>();
 		
-		if(uid <= 0) {
+		if(uid <= 0 || friendId <= 0) {
 			return null;
 		}
 
@@ -898,10 +927,20 @@ public class DBConnector {
 				int messageId = rs.getInt(1);
 				int senderId = rs.getInt(2);
 				int receiverId = rs.getInt(3);
+				int readFlag = rs.getInt(6);
 				Timestamp ts = rs.getTimestamp(4);
 				String content = rs.getString(5);
 				ChatMessage message = new ChatMessage(messageId, senderId, receiverId, ts, content);
 				messages.add(message);
+				// set readFlag to 1
+				if(readFlag == 0) {
+					String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `receiverID`=?"; 
+					updatePrepStmt = con.prepareStatement(updateStatement);
+					updatePrepStmt.setInt(1, uid);
+					if(updatePrepStmt.executeUpdate() != 0) {
+						// anything to do?
+					}
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -913,6 +952,11 @@ public class DBConnector {
 		return messages;
 	}
 	
+	/*
+	 * getNewMessagesFromFriend
+	 * 
+	 * Get new unread messages from the specific friend, and set readFlag to 1
+	 */
 	static public List<ChatMessage> getNewMessagesFromFriend(int uid, int friendId)
 	{
 		Connection con=null;
@@ -989,20 +1033,24 @@ public class DBConnector {
 		return result;
 	}
 	
-	static public List<ChatMessage> sendMessage(int uid, int friendId, String content)
+	/*
+	 * sendMessage
+	 * 
+	 * Send a message to friend
+	 */
+	static public int sendMessage(int uid, int friendId, String content)
 	{
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
-		List<ChatMessage> messages = null;
+		//List<ChatMessage> messages = null;
+		int result = DB_STATUS_ERR_GENERIC;
 		
-		if(uid <= 0 || friendId <=0) {
-			return null;
+		if(uid <= 0 || friendId <=0 || 
+				content == null || content.isEmpty()) {
+			return DB_STATUS_ERR_BAD_ARGS;
 		}
-		
-		// Get new messages first
-		messages = getNewMessagesFromFriend(uid, friendId);
-		
+				
 		try {
 			con=getConnection();
 			String insertStatement = "insert into messages (senderID, receiverID, sendTime, readFlag, content)" 
@@ -1013,8 +1061,10 @@ public class DBConnector {
 			prepStmt.setInt(2, friendId);
 			prepStmt.setString(3, content);
 			if(prepStmt.executeUpdate() != 0) {
-				messages.add(new ChatMessage(0, uid, friendId, new Timestamp(System.currentTimeMillis()), content));
+				//messages.add(new ChatMessage(0, uid, friendId, new Timestamp(System.currentTimeMillis()), content));
+				result = DB_STATUS_OK;
 			} else {
+				result = DB_STATUS_ERR_SQL;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1023,7 +1073,7 @@ public class DBConnector {
 			closePrepStmt(prepStmt);
 			closeConnection(con);
 		}
-		return messages;
+		return result;
 	}
 	
 /*	public static void main(String[] args) {

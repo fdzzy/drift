@@ -1,16 +1,10 @@
-package com.drift.servlet;
+package com.drift.util;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -18,57 +12,22 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.drift.core.DBConnector;
 import com.drift.core.User;
-import com.drift.util.FileUtil;
-import com.drift.util.PhotoUtil;
+import com.drift.servlet.MyServletUtil;
 
-
-/**
- * Servlet implementation class UploadPhotoServlet
- */
-@WebServlet("/upload")
-public class UploadPhotoServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public UploadPhotoServlet() {
-        super();
-    }
-    
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		MyServletUtil.setCharacterEncoding(request, response);
-		
-		User user = MyServletUtil.checkLogin(request, response);
-		if(user == null) {
-			return;
-		}
-		
-		int uid = user.getUid();		
-		//String path = request.getRealPath("photo") + "\\";	//上传文件目录
-		String path = getServletContext().getRealPath("/photo"); //上传文件目录
-		System.out.println(path);
-		
-		int status = PhotoUtil.uploadPhoto(request, path, uid);
-		if(status == DBConnector.DB_STATUS_OK) {
-			OutputStream out = response.getOutputStream();
-			out.write("upload succeed".getBytes());
-		}
-/*		File uploadPath = new File(path);//上传文件目录
-
+public class PhotoUtil {
 	
-		if (!uploadPath.exists()) {
-			uploadPath.mkdirs();
-		}
-		// 临时文件目录
+	public static int uploadPhoto(HttpServletRequest request, String path, int uid) {
+		
+		int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+		
 		File tempPathFile = new File(path+"/tmp");
 		if (!tempPathFile.exists()) {
 			tempPathFile.mkdirs();
 		}
+		
 		try {
+			User user = DBConnector.getUser(uid);
+			
 			// Create a factory for disk-based file items
 			DiskFileItemFactory factory = new DiskFileItemFactory();
 
@@ -85,7 +44,7 @@ public class UploadPhotoServlet extends HttpServlet {
 			List<FileItem> items = upload.parseRequest(request);//得到所有的文件
 			Iterator<FileItem> i = items.iterator();
 			//PhotoHandler photoHandler = new LocalPhotoHandler();
-			int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+
 			while (i.hasNext()) {
 				//System.out.println("hasNext:");
 				FileItem fi = (FileItem) i.next();
@@ -106,25 +65,14 @@ public class UploadPhotoServlet extends HttpServlet {
 					//System.out.println(newFileName);
 					File savedFile = new File(userpath, newFileName);
 					fi.write(savedFile);
-					dbStatus = DBConnector.setPhoto(uid, newFileName);
-					
+					dbStatus = DBConnector.setPhoto(uid, newFileName);					
 					FileUtil.limitFiles(uploadPath);
 				}
 			}
-			if(dbStatus == DBConnector.DB_STATUS_OK) {
-				OutputStream out = response.getOutputStream();
-				out.write("upload succeed".getBytes());
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}*/
+		}
+		
+		return dbStatus;
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
-	}
-
 }

@@ -44,7 +44,7 @@ public final class SendEmail {
 		try {
 			// Step 1: Configure the Mail Session
 			Session mailSession = Session.getDefaultInstance(props);
-			mailSession.setDebug(true);
+			//mailSession.setDebug(true);
 			
 			// Step 2: Construct the Message
 			Message message = new MimeMessage(mailSession);

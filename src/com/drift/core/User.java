@@ -1,8 +1,15 @@
 package com.drift.core;
 
 import java.sql.Timestamp;
+//import java.text.DateFormat;
+//import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
-public class User implements Comparable<User> {
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
+
+public class User implements Comparable<User>, JSONAware {
 
 	private int uid = 0;
 	private String username = null;
@@ -28,6 +35,26 @@ public class User implements Comparable<User> {
 	public String toString() {
 		return uid + ":" + username;
 	}
+	
+	@Override
+	public String toJSONString() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.put("username", username);
+		map.put("nickname", nickname);
+		map.put("sex", sex);
+		map.put("school", school);
+		map.put("department", department);
+		map.put("major", major);
+		map.put("email", email);
+		map.put("birthday", birthday);
+		map.put("enrollYear", enrollYear);
+		
+		JSONObject obj = new JSONObject(map);
+		return obj.toJSONString();
+	}
+	
+	
 
 	public User() {
 	}

@@ -2,6 +2,7 @@ package com.drift.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -78,12 +79,19 @@ public class SendReceiveMessage extends HttpServlet {
 		} else if(action.equals("send")) {
 			String content = (String) request.getParameter("content");
 			List<ChatMessage> messages = null;
-			messages = DBConnector.sendMessage(user.getUid(), friendId, content);
-			JSONArray array = new JSONArray();
-			for(ChatMessage msg : messages) {
-				array.add(msg);
+			int uid = user.getUid();
+			int result = DBConnector.sendMessage(uid, friendId, content);
+			if(result == DBConnector.DB_STATUS_OK) {
+				messages = DBConnector.getNewMessagesFromFriend(uid, friendId);
+				messages.add(new ChatMessage(0, uid, friendId, new Timestamp(System.currentTimeMillis()), content));
+				JSONArray array = new JSONArray();
+				for(ChatMessage msg : messages) {
+					array.add(msg);
+				}
+				out.print(array);
+			} else {
+				out.print("error");
 			}
-			out.print(array);
 		}
 		
 	}

@@ -41,7 +41,7 @@ public class MyBottlesServlet extends HttpServlet {
 		
 		//Set<User> friends = null;
 		List<ChatMessage> messages = null;
-		messages = DBConnector.getMessages(user.getUid(), 0, 30);
+		messages = DBConnector.getMyBottles(user.getUid(), 0, 30);
 		
 		if(messages != null && !messages.isEmpty()) {
 			request.setAttribute("messages", messages);

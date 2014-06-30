@@ -7,7 +7,6 @@
 <%@page import="com.drift.core.DBConnector"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
-
 <%
 	String uidStr = request.getParameter("uid");
 	String friendIdStr = request.getParameter("friendId");

@@ -3,6 +3,8 @@
  */
 package com.drift.baidu.constants;
 
+import com.drift.servlet.MyServletUtil;
+
 
 /**
  * 
@@ -15,6 +17,6 @@ public class BaiduAppConstant {
     
     public static final String CLIENTSECRET="UHr49okRa3ZLL0OGZHpXl0axmG0ck0Qz";
     
-    public static final String REDIRECTURI = "http://127.0.0.1:8080/drift/baiduCallback";
+    public static final String REDIRECTURI = MyServletUtil.entryURL + "/baiduCallback";
     
 }

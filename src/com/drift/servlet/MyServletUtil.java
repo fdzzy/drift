@@ -89,7 +89,7 @@ public final class MyServletUtil {
 	}
 
 	
-	// REST API Login
+	// REST API ApiLogin
 	public static final int API_CODE_LOGIN_SUCCEED = 10000;
 	public static final int API_CODE_LOGIN_ERR_UNKOWN = 10001;
 	public static final int API_CODE_LOGIN_BAD_ARGS = 10002;

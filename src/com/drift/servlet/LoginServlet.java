@@ -12,7 +12,7 @@ import com.drift.core.DBConnector;
 import com.drift.core.DBResult;
 
 /**
- * Servlet implementation class LoginServlet
+ * Servlet implementation class ApiLogin
  */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {

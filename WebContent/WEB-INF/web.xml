@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
   <display-name>myFirstWeb</display-name>
   <servlet>
     <description></description>
@@ -37,15 +37,12 @@
     <servlet-name>BaiduCallBackServlet</servlet-name>
     <url-pattern>/baiduCallback</url-pattern>
   </servlet-mapping>
-  
   <resource-ref>
-  	<description>DB Connection</description>
-  	<res-ref-name>jdbc/DateDB</res-ref-name>
-  	<res-type>javax.sql.DataSource</res-type>
-  	<res-auth>Container</res-auth>
+    <description>DB Connection</description>
+    <res-ref-name>jdbc/DateDB</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
   </resource-ref>
-  
-  
   <welcome-file-list>
     <welcome-file>login</welcome-file>
   </welcome-file-list>

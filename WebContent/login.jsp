@@ -42,14 +42,16 @@ if(msg!=null && !msg.isEmpty()){
 
 </form>
 
-<!-- 
+ 
 <center>
 <a href="baiduOauthCode"><img src="img/baidu.png"/></a>&nbsp;
-<a href=""><img src="img/sina_weibo.png"/></a>&nbsp;
+<a href="sinaOauth"><img src="img/sina_weibo.png"/></a>&nbsp;
 <a href=""><img src="img/renren.png"/></a>&nbsp;
+<!-- 
 <a href="">qq</a>&nbsp;
 <a href="">腾讯微博</a>&nbsp;
-</center>
  -->
+</center>
+
 
 </body></html>

@@ -46,10 +46,11 @@ public class ApiGetUnread extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 51000;
-		final int ERR_UNKOWN = 51001;
-		//final int ERR_BAD_ARGS = 51002;
-		final int ERR_NO_MESSAGES = 51003;
+		final int SUCCESS = 510;
+		final int ERR_UNKOWN = 511;
+		//final int ERR_BAD_ARGS = 512;
+		//final int ERR_NO_SUCH_USER = 513;
+		final int ERR_NO_MESSAGES = 514;
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

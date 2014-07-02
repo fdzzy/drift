@@ -44,9 +44,9 @@ public class ApiSendBottle extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 22000;
-		final int ERR_UNKOWN = 22001;
-		final int ERR_BAD_ARGS = 22002;
+		final int SUCCESS = 220;
+		final int ERR_UNKOWN = 221;
+		final int ERR_BAD_ARGS = 222;
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

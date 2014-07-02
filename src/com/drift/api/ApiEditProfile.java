@@ -49,9 +49,9 @@ public class ApiEditProfile extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 40000;
-		final int ERR_UNKOWN = 40001;
-		final int ERR_BAD_ARGS = 40002;
+		final int SUCCESS = 400;
+		final int ERR_UNKOWN = 401;
+		final int ERR_BAD_ARGS = 402;
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

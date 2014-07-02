@@ -46,10 +46,11 @@ public class ApiGetConversation extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 50000;
-		final int ERR_UNKOWN = 50001;
-		//final int ERR_BAD_ARGS = 50002;
-		final int ERR_NO_MESSAGES = 50003;
+		final int SUCCESS = 500;
+		final int ERR_UNKOWN = 501;
+		//final int ERR_BAD_ARGS = 502;
+		//final int ERR_NO_SUCH_USER = 503;
+		final int ERR_NO_MESSAGES = 504;
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

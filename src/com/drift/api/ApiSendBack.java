@@ -43,9 +43,9 @@ public class ApiSendBack extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 21000;
-		final int ERR_UNKOWN = 21001;
-		final int ERR_BAD_ARGS = 21002;
+		final int SUCCESS = 210;
+		final int ERR_UNKOWN = 211;
+		final int ERR_BAD_ARGS = 212;
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

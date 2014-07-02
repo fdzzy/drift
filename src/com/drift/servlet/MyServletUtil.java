@@ -24,8 +24,8 @@ public final class MyServletUtil {
 	public static final String doPostBottleJspPage = "/do_post.jsp";
 	
 	
-	//public static final String entryURL = "http://driftlove.duapp.com";
-	public static final String entryURL = "http://localhost:8080/drift";
+	public static final String entryURL = "http://driftlove.duapp.com";
+	//public static final String entryURL = "http://localhost:8080/drift";
 	
 	// SESSION Variable Constants
 	public static final String SESS_UID = "userId";			// Deprecated
@@ -90,13 +90,13 @@ public final class MyServletUtil {
 
 	
 	// REST API ApiLogin
-	public static final int API_CODE_LOGIN_SUCCEED = 10000;
-	public static final int API_CODE_LOGIN_ERR_UNKOWN = 10001;
-	public static final int API_CODE_LOGIN_BAD_ARGS = 10002;
-	public static final int API_CODE_LOGIN_USER_NOT_EXIST = 10003;
-	public static final int API_CODE_LOGIN_ERR_PASSWORD = 10004;
-	public static final int API_CODE_LOGIN_EMAIL_NOT_EXIST = 10005;
-	public static final int API_CODE_LOGIN_USER_NOT_ACTIVATED = 10006;
+	public static final int API_CODE_LOGIN_SUCCEED = 100;
+	public static final int API_CODE_LOGIN_ERR_UNKOWN = 101;
+	public static final int API_CODE_LOGIN_BAD_ARGS = 102;
+	public static final int API_CODE_LOGIN_USER_NOT_EXIST = 103;
+	public static final int API_CODE_LOGIN_ERR_PASSWORD = 104;
+	public static final int API_CODE_LOGIN_EMAIL_NOT_EXIST = 105;
+	public static final int API_CODE_LOGIN_USER_NOT_ACTIVATED = 106;
 	
 	public static final String[] API_CODE_LOGIN_STRINGS = {
 		"Succeed",
@@ -143,11 +143,11 @@ public final class MyServletUtil {
 	}
 	
 	// REST API Register
-	public static final int API_CODE_REGISTER_SUCCEED = 11000;
-	public static final int API_CODE_REGISTER_ERR_UNKOWN = 11001;
-	public static final int API_CODE_REGISTER_BAD_ARGS = 11002;
-	public static final int API_CODE_REGISTER_USER_EXIST = 11003;
-	public static final int API_CODE_REGISTER_EMAIL_EXIST = 11004;
+	public static final int API_CODE_REGISTER_SUCCEED = 110;
+	public static final int API_CODE_REGISTER_ERR_UNKOWN = 111;
+	public static final int API_CODE_REGISTER_BAD_ARGS = 112;
+	public static final int API_CODE_REGISTER_USER_EXIST = 113;
+	public static final int API_CODE_REGISTER_EMAIL_EXIST = 114;
 	
 	public static final String[] API_CODE_REGISTER_STRINGS = {
 		"Succeed",

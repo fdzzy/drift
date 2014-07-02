@@ -46,10 +46,10 @@ public class ApiMyBottles extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 30000;
-		final int ERR_UNKOWN = 30001;
-		final int ERR_BAD_ARGS = 30002;
-		final int ERR_NO_BOTTLES = 30003;	
+		final int SUCCESS = 300;
+		final int ERR_UNKOWN = 301;
+		final int ERR_BAD_ARGS = 302;
+		final int ERR_NO_BOTTLES = 303;	
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

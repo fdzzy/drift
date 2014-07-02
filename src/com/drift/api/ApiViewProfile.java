@@ -43,10 +43,10 @@ public class ApiViewProfile extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 41000;
-		final int ERR_UNKOWN = 41001;
-		//final int ERR_BAD_ARGS = 41002;
-		final int ERR_NO_SUCH_USER = 41003;
+		final int SUCCESS = 410;
+		final int ERR_UNKOWN = 411;
+		//final int ERR_BAD_ARGS = 412;
+		final int ERR_NO_SUCH_USER = 413;
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

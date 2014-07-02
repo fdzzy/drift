@@ -43,10 +43,10 @@ public class ApiUploadPhoto extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		final int SUCCESS = 43000;
-		final int ERR_UNKOWN = 43001;
-		//final int ERR_BAD_ARGS = 43002;
-		//final int ERR_NO_SUCH_USER = 43003;
+		final int SUCCESS = 430;
+		final int ERR_UNKOWN = 431;
+		//final int ERR_BAD_ARGS = 432;
+		//final int ERR_NO_SUCH_USER = 433;
 
 		int status = ERR_UNKOWN;
 		Map<String, Object> map = new HashMap<String, Object>();

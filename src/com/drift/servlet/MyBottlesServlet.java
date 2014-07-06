@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
 import com.drift.core.User;
 
 /**
@@ -31,6 +32,7 @@ public class MyBottlesServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		MyServletUtil.setCharacterEncoding(request, response);
 		
@@ -41,7 +43,10 @@ public class MyBottlesServlet extends HttpServlet {
 		
 		//Set<User> friends = null;
 		List<ChatMessage> messages = null;
-		messages = DBConnector.getMyBottles(user.getUid(), 0, 30);
+		DBResult result = DBConnector.getMyBottles(user.getUid(), 0, 30);
+		if(result.getCode() == DBConnector.DB_STATUS_OK) {
+			messages = (List<ChatMessage>) result.getResultObject();
+		}
 		
 		if(messages != null && !messages.isEmpty()) {
 			request.setAttribute("messages", messages);

@@ -33,42 +33,35 @@ public class ApiSendMessage extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
 		String friendIdStr = request.getParameter("friendId");
 		String content = request.getParameter("content");
-		int uid = 0, friendId = 0;
-		try {
-			uid = Integer.parseInt(uidStr);
-			friendId = Integer.parseInt(friendIdStr);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(uidStr == null || friendIdStr == null || content == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
+		} else {
+			int uid = 0, friendId = 0;
+			try {
+				uid = Integer.parseInt(uidStr);
+				friendId = Integer.parseInt(friendIdStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if(uid <= 0 || (DBConnector.checkUser(uid) ==  false)) {
+				status = ApiController.API_ERR_BAD_USER_ID;
+			} else if(friendId <= 0 || (DBConnector.checkUser(friendId) == false)) {
+				status = ApiController.API_ERR_BAD_FRIEND_ID;
+			} else {
+				int rtval = DBConnector.sendMessage(uid, friendId, content);
+				status = ApiController.mapDBCode(rtval);
+			}
 		}
-
-		final int SUCCESS = 520;
-		final int ERR_UNKOWN = 521;
-		final int ERR_BAD_ARGS = 522;
-		//final int ERR_NO_SUCH_USER = 523;
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		int result = DBConnector.sendMessage(uid, friendId, content);
-
-		switch (result) {
-		case DBConnector.DB_STATUS_ERR_BAD_ARGS:
-			status = ERR_BAD_ARGS;
-			map.put("result", "Bad Arguments");
-			break;
-		case DBConnector.DB_STATUS_OK:
-			status = SUCCESS;
-			map.put("result", "Succeed");
-			break;
-		default:
-			status = ERR_UNKOWN;
-			map.put("result", "Unknown Error");		
-		}
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
 		PrintWriter out = response.getWriter();

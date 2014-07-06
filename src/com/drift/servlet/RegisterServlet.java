@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.DBConnector;
-import com.drift.core.DBResult;
 
 /**
  * Servlet implementation class RegisterServlet
@@ -100,11 +99,10 @@ public class RegisterServlet extends HttpServlet {
 			return page;
 		}
 		
-		DBResult result = null;
-		result = DBConnector.register(username, nickname, password, sex, birthday, school, 
+		int result = DBConnector.register(username, nickname, password, sex, birthday, school, 
 					department, major, enrollYear, email);
 		
-		switch (result.getCode()) {
+		switch (result) {
 		case DBConnector.DB_STATUS_OK:
 			page = MyServletUtil.registerOkJspPage;
 			request.setAttribute("username",username);

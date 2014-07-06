@@ -20,6 +20,10 @@ public class PhotoUtil {
 		
 		int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
 		
+		if(uid <=0 || request == null || path == null || path.isEmpty()) {
+			return DBConnector.DB_STATUS_ERR_BAD_ARGS;
+		}
+		
 		File tempPathFile = new File(path+"/tmp");
 		if (!tempPathFile.exists()) {
 			tempPathFile.mkdirs();

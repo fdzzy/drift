@@ -34,45 +34,35 @@ public class ApiUploadPhoto extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
-		int uid = 0;
-		try {
-			uid = Integer.parseInt(uidStr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		final int SUCCESS = 430;
-		final int ERR_UNKOWN = 431;
-		//final int ERR_BAD_ARGS = 432;
-		//final int ERR_NO_SUCH_USER = 433;
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		PrintWriter out = response.getWriter();
-		if(uid <= 0) {
-			map.put("code", status);
-			out.print(JSONUtil.toJSONString(map));
-			out.flush();
-			return;
-		}
-
-		String path = getServletContext().getRealPath("/photo"); //上传文件目录
-		System.out.println(path);
-		int dbStatus = PhotoUtil.uploadPhoto(request, path, uid);
-
-		if(dbStatus == DBConnector.DB_STATUS_OK) {
-			status = SUCCESS;
-			map.put("result", "Succeed");
+		if(uidStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
 		} else {
-			map.put("result", "Unkown Error");
+			int uid = 0;
+			try {
+				uid = Integer.parseInt(uidStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if(DBConnector.checkUser(uid) == false) {
+				status = ApiController.API_ERR_BAD_USER_ID;
+			} else {
+				String path = getServletContext().getRealPath("/photo"); //上传文件目录
+				//System.out.println(path);
+				int dbStatus = PhotoUtil.uploadPhoto(request, path, uid);
+				status = ApiController.mapDBCode(dbStatus);
+			}
 		}
-
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
+		PrintWriter out = response.getWriter();
 		out.print(JSONUtil.toJSONString(map));
 		out.flush();
 	}

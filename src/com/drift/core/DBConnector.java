@@ -32,7 +32,8 @@ public class DBConnector {
 	public static final int DB_STATUS_ERR_EMAIL_EXISTS = -7;
 	public static final int DB_STATUS_ERR_PASSWORD = -8;
 	public static final int DB_STATUS_ERR_USER_NOT_ACTIVATED = -9;
-	public static final int DB_STATUS_ERR_ACTIVATE_CODE = -10;
+	public static final int DB_STATUS_ERR_USER_ID = -10;
+	public static final int DB_STATUS_ERR_BOTTLE_ID = -11;
 	
 	static DataSource ds = null;
 	
@@ -155,7 +156,7 @@ public class DBConnector {
 	 *	0:		succeed
 	 *	< 0:	error
 	 */
-	static public DBResult register(String username,
+	static public int register(String username,
 			String nickname,
 			String password,
 			String sex,
@@ -174,14 +175,13 @@ public class DBConnector {
 		PreparedStatement selectPrepStmt3 = null;
 		ResultSet selectRs3 = null;
 		
-		DBResult result = new DBResult();
+		int result = DB_STATUS_ERR_GENERIC;
 		
 		if(username == null || username.isEmpty() ||
 			password == null || password.isEmpty() ||
 			email == null || email.isEmpty() ||
 			sex == null || (!sex.equals("male") && !sex.equals("female"))) {
-			result.setCode(DB_STATUS_ERR_BAD_ARGS);
-			return result;
+			return DB_STATUS_ERR_BAD_ARGS;
 		}
 
 		try {
@@ -193,8 +193,7 @@ public class DBConnector {
 
 			if (selectRs1.next()) {
 				//user name exists in DB already
-				result.setCode(DB_STATUS_ERR_USER_EXISTS);
-				return result;
+				return DB_STATUS_ERR_USER_EXISTS;
 			} 
 
 			selectStatement = "select ID from users where EMAIL=?";
@@ -204,8 +203,7 @@ public class DBConnector {
 
 			if(selectRs2.next()) {
 				//email exists in DB already
-				result.setCode(DB_STATUS_ERR_EMAIL_EXISTS);
-				return result;
+				return DB_STATUS_ERR_EMAIL_EXISTS;
 			}
 
 			//java.util.Date date = new java.util.Date();
@@ -255,12 +253,12 @@ public class DBConnector {
 					SendEmail.send(email, subject, content.toString());    		  
 
 					//System.out.println("DB timestamp is " + timestamp2.getTime());
-					result.setCode(DB_STATUS_OK);
+					result = DB_STATUS_OK;
 				} else {
-					result.setCode(DB_STATUS_ERR_SQL);
+					result = DB_STATUS_ERR_SQL;
 				}
 			} else {
-				result.setCode(DB_STATUS_ERR_SQL);
+				result = DB_STATUS_ERR_SQL;
 			}
 		} catch (Exception e) {
 			e.printStackTrace(); 
@@ -376,8 +374,7 @@ public class DBConnector {
 						if(activated == 0) {
 							result.setCode(DB_STATUS_ERR_USER_NOT_ACTIVATED);
 						} else {
-							User user = getUser(uid);
-							result.setUser(user);
+							result.setResultObject(getUser(uid));
 							result.setCode(DB_STATUS_OK);
 						}
 					} else {
@@ -402,8 +399,7 @@ public class DBConnector {
 						if(activated == 0) {
 							result.setCode(DB_STATUS_ERR_USER_NOT_ACTIVATED);
 						} else {
-							User user = getUser(uid);
-							result.setUser(user);
+							result.setResultObject(getUser(uid));
 							result.setCode(DB_STATUS_OK);
 						}
 					} else {
@@ -479,6 +475,10 @@ public class DBConnector {
 		if(uid <= 0) {
 			return DB_STATUS_ERR_BAD_ARGS;
 		}
+		
+		if(checkUser(uid) == false) {
+			return DB_STATUS_ERR_USER_ID;
+		}
 
 		if(birthday == null || birthday.isEmpty()) {
 			birthday = "1990-01-01";
@@ -529,6 +529,10 @@ public class DBConnector {
 		if(uid <= 0 || content == null || content.isEmpty()) {
 			return DB_STATUS_ERR_BAD_ARGS;
 		}
+		
+		if(checkUser(uid) == false) {
+			return DB_STATUS_ERR_USER_ID;
+		}
 
 		try {
 			con=getConnection();
@@ -562,8 +566,9 @@ public class DBConnector {
 		ResultSet rs=null;
 		User user = null;
 		
-		if(userId <= 0)
+		if(userId <= 0) {
 			return null;
+		}
 
 		try {
 			con=getConnection();
@@ -588,7 +593,6 @@ public class DBConnector {
 				user = new User(userId, name, nickname, sex, school, department, major, email, birthday, enrollYear, ts);
 			} else {
 				//username does not exist in DB
-				user = null;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -600,6 +604,41 @@ public class DBConnector {
 		return user;
 	}
  
+	/*
+	 * check to see if the uid User exists
+	 */
+	static public boolean checkUser(int uid) {
+		Connection con=null;
+		PreparedStatement prepStmt=null;
+		ResultSet rs=null;
+		boolean rtval = false;
+		
+		if(uid <= 0) {
+			return rtval;
+		}
+
+		try {
+			con=getConnection();
+			String selectStatement = "select ID from users where ID=?";
+			prepStmt = con.prepareStatement(selectStatement);
+			prepStmt.setInt(1, uid);
+			rs = prepStmt.executeQuery();
+
+			if (rs.next()) {
+				rtval = true;
+			} else {
+				//user does not exist in DB
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			closeResultSet(rs);
+			closePrepStmt(prepStmt);
+			closeConnection(con);
+		}
+		return rtval;
+	}
+	
 	/* set user photo filename info from DB
 	 *
 	 * Return value:
@@ -611,6 +650,10 @@ public class DBConnector {
 		ResultSet rs=null;
 		int rtval = DB_STATUS_ERR_GENERIC;
 
+		if(uid <= 0 || filename == null || filename.isEmpty()) {
+			return DB_STATUS_ERR_BAD_ARGS;
+		}
+		
 		try {
 			con=getConnection();
 			// Update photo filename in Database
@@ -683,7 +726,7 @@ public class DBConnector {
 	 * 	
 	 * TODO: This function should be synchronized
 	 */
-	static public Bottle getBottle(int uid) {
+	static public DBResult getBottle(int uid) {
 		Connection con = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
@@ -691,10 +734,12 @@ public class DBConnector {
 		ResultSet rs2 = null;
 		PreparedStatement updatePrepStmt = null;
 		String sex = null;
+		DBResult result = new DBResult();
 		Bottle bottle = null;
 		
 		if(uid <= 0) {
-			return null;
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
 		}
 
 		try {
@@ -724,10 +769,13 @@ public class DBConnector {
 					updatePrepStmt.setInt(2, bottleId);
 					if(updatePrepStmt.executeUpdate() != 0) {
 						bottle = new Bottle(bottleId, senderId, senderName, content);
+						result.setResultObject(bottle);
+						result.setCode(DB_STATUS_OK);
 					}
 				}
 			} else {
 				//username does not exist in DB
+				result.setCode(DB_STATUS_ERR_USER_ID);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -739,7 +787,7 @@ public class DBConnector {
 			closePrepStmt(updatePrepStmt);
 			closeConnection(con);
 		}
-		return bottle;
+		return result;
 	}
 
 	// return value: sender ID
@@ -785,6 +833,7 @@ public class DBConnector {
 				}
 			} else {
 				//bottle does not exist in DB
+				rtval = DB_STATUS_ERR_BOTTLE_ID;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -816,7 +865,7 @@ public class DBConnector {
 			if(prepStmt.executeUpdate() != 0) {
 				rtval = DB_STATUS_OK;
 			} else {
-				rtval = DB_STATUS_ERR_SQL;
+				rtval = DB_STATUS_ERR_BOTTLE_ID;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -835,7 +884,7 @@ public class DBConnector {
 	 * Also get the latest message with that friend
 	 * 
 	 */
-	static public List<ChatMessage> getMyBottles(int uid, int start, int length)
+	static public DBResult getMyBottles(int uid, int start, int length)
 	{
 		Connection con = null;
 		PreparedStatement prepStmt = null;
@@ -843,9 +892,16 @@ public class DBConnector {
 		PreparedStatement updatePrepStmt = null;
 		//Set<User> friends = new TreeSet<User>();
 		List<ChatMessage> messages = new ArrayList<ChatMessage>();
+		DBResult result = new DBResult();
 		
 		if(uid <= 0) {
-			return null;
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
+		}
+		
+		if(checkUser(uid) == false) {
+			result.setCode(DB_STATUS_ERR_USER_ID);
+			return result;
 		}
 
 		try {
@@ -883,6 +939,8 @@ public class DBConnector {
 			if(updatePrepStmt.executeUpdate() != 0) {
 				// anything to do?
 			}
+			result.setResultObject(messages);
+			result.setCode(DB_STATUS_OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
@@ -891,7 +949,7 @@ public class DBConnector {
 			closePrepStmt(updatePrepStmt);
 			closeConnection(con);
 		}
-		return messages;
+		return result;
 	}
 	
 	/*
@@ -899,16 +957,18 @@ public class DBConnector {
 	 * 
 	 * Get the messages with the specific friend, and set readFlag to 1
 	 */
-	static public List<ChatMessage> getConversation(int uid, int friendId)
+	static public DBResult getConversation(int uid, int friendId)
 	{
 		Connection con = null;
 		PreparedStatement prepStmt = null;
 		PreparedStatement updatePrepStmt = null;
 		ResultSet rs = null;
 		List<ChatMessage> messages = new ArrayList<ChatMessage>();
+		DBResult result = new DBResult();
 		
 		if(uid <= 0 || friendId <= 0) {
-			return null;
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
 		}
 
 		try {
@@ -942,6 +1002,8 @@ public class DBConnector {
 					}
 				}
 			}
+			result.setResultObject(messages);
+			result.setCode(DB_STATUS_OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
@@ -949,7 +1011,7 @@ public class DBConnector {
 			closePrepStmt(prepStmt);
 			closeConnection(con);
 		}
-		return messages;
+		return result;
 	}
 	
 	/*
@@ -957,15 +1019,17 @@ public class DBConnector {
 	 * 
 	 * Get new unread messages from the specific friend, and set readFlag to 1
 	 */
-	static public List<ChatMessage> getNewMessagesFromFriend(int uid, int friendId)
+	static public DBResult getNewMessagesFromFriend(int uid, int friendId)
 	{
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
 		List<ChatMessage> messages = new ArrayList<ChatMessage>();
+		DBResult result = new DBResult();
 		
-		if(uid <= 0) {
-			return null;
+		if(uid <= 0 || friendId <= 0) {
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
 		}
 
 		try {
@@ -992,6 +1056,8 @@ public class DBConnector {
 					messages.add(message);
 				}				
 			}
+			result.setResultObject(messages);
+			result.setCode(DB_STATUS_OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
@@ -999,7 +1065,7 @@ public class DBConnector {
 			closePrepStmt(prepStmt);
 			closeConnection(con);
 		}
-		return messages;
+		return result;
 	} 
 	
 	static public int getNewMessageCount(int uid)

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
 import com.drift.core.User;
 
 /**
@@ -56,6 +57,7 @@ public class HandleBottleServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void handleReply(HttpServletRequest request,
 			HttpServletResponse response, int uid, int bottleId) throws ServletException,
 			IOException {			
@@ -66,7 +68,10 @@ public class HandleBottleServlet extends HttpServlet {
 			//System.out.println(senderID);
 			List<ChatMessage> messages = null;
 			User friend = null;
-			messages = DBConnector.getConversation(uid, senderID);
+			DBResult result = DBConnector.getConversation(uid, senderID);
+			if(result.getCode() == DBConnector.DB_STATUS_OK) {
+				messages = (List<ChatMessage>) result.getResultObject();
+			}
 			friend = DBConnector.getUser(senderID);
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);

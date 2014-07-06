@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.DBConnector;
-import com.drift.core.DBResult;
-import com.drift.servlet.MyServletUtil;
 import com.drift.util.JSONUtil;
 
 /**
@@ -50,12 +48,11 @@ public class ApiRegister extends HttpServlet {
 		if(birthday == null || birthday.isEmpty())
 			birthday = "1990-01-01";
 
-		int status = MyServletUtil.API_CODE_REGISTER_ERR_UNKOWN;
-		DBResult result = DBConnector.register(username, nickname, password, sex, birthday, 
+		int result = DBConnector.register(username, nickname, password, sex, birthday, 
 				school, department, major, enrollYear, email);
-		status = MyServletUtil.getRegisterStatusCode(result.getCode());	
-		String msg = MyServletUtil.getRegisterMessage(status);
-		//System.out.println(status);
+		int status = ApiController.mapDBCode(result);
+		String msg = ApiController.API_CODE_STRINGS.get(status);
+		//System.out.println(result.getCode() + " " + status);
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("code", status);

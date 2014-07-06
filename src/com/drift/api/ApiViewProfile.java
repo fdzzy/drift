@@ -34,35 +34,31 @@ public class ApiViewProfile extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
-		int uid = 0;
-		try {
-			uid = Integer.parseInt(uidStr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		final int SUCCESS = 410;
-		final int ERR_UNKOWN = 411;
-		//final int ERR_BAD_ARGS = 412;
-		final int ERR_NO_SUCH_USER = 413;
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		User targetUser = DBConnector.getUser(uid);
-
-		if(targetUser == null) {
-			status = ERR_NO_SUCH_USER;
-			map.put("result", "User does not exist");
+		if(uidStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
 		} else {
-			status = SUCCESS;
-			map.put("result", "Succeed");
-			map.put("profile", targetUser);
-		}
+			int uid = 0;
+			try {
+				uid = Integer.parseInt(uidStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
+			User targetUser = DBConnector.getUser(uid);
+			if(targetUser == null) {
+				status = ApiController.API_ERR_BAD_USER_ID;
+			} else {
+				status = ApiController.API_ACTION_OK;
+				map.put("profile", targetUser);
+			}
+		}
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
 		PrintWriter out = response.getWriter();

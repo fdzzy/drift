@@ -33,37 +33,27 @@ public class ApiSendBack extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String bidStr = request.getParameter("bid");
-		int bid = 0;
+		if(bidStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
+		} else {
+			int bid = 0;
 
-		try {
-			bid = Integer.parseInt(bidStr);
-		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				bid = Integer.parseInt(bidStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			int rtval = DBConnector.setBottleUnread(bid);
+			status = ApiController.mapDBCode(rtval);
 		}
-
-		final int SUCCESS = 210;
-		final int ERR_UNKOWN = 211;
-		final int ERR_BAD_ARGS = 212;
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		int result = DBConnector.setBottleUnread(bid);
-		switch(result) {
-		case DBConnector.DB_STATUS_OK:
-			status = SUCCESS;
-			map.put("result", "Succeed");
-			break;
-		case DBConnector.DB_STATUS_ERR_BAD_ARGS:
-			status = ERR_BAD_ARGS;
-			map.put("result", "Bad Arguments");
-			break;
-		default:
-			map.put("result", "Unknown Error");
-		}
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
 		PrintWriter out = response.getWriter();

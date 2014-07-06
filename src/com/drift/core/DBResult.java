@@ -4,24 +4,24 @@ public class DBResult {
 
 
 	private int code;	// status code
-	private User user;
+	private Object result; 	// result object
 	
-	public User getUser() {
-		return user;
+	public Object getResultObject() {
+		return result;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setResultObject(Object result) {
+		this.result = result;
 	}
 
 	public DBResult() {
 		this.code = DBConnector.DB_STATUS_ERR_GENERIC;
-		this.user = null;
+		this.result = null;
 	}	
 	
-	public DBResult(int code, User user) {
+	public DBResult(int code, Object result) {
 		this.code = code;
-		this.user = user;
+		this.result = result;
 	}
 	
 	public int getCode() {

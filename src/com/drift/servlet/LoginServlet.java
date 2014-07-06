@@ -1,6 +1,7 @@
 package com.drift.servlet;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -8,8 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+
+
 import com.drift.core.DBConnector;
 import com.drift.core.DBResult;
+import com.drift.core.User;
 
 /**
  * Servlet implementation class ApiLogin
@@ -47,12 +51,13 @@ public class LoginServlet extends HttpServlet {
 		DBResult result = null;
 		
 		result = DBConnector.login(username, password);
+		User user = (User) result.getResultObject();
 		
 		switch (result.getCode()) {
 		case DBConnector.DB_STATUS_OK:
 			// login success
 			HttpSession session = request.getSession();
-			session.setAttribute(MyServletUtil.SESS_USER, result.getUser());
+			session.setAttribute(MyServletUtil.SESS_USER, user);
 			page = MyServletUtil.mainJspPage;
 			break;
 		case DBConnector.DB_STATUS_ERR_USER_NOT_EXIST:

@@ -35,6 +35,10 @@ if(user == null) {
 	return;
 }
 
+// the profile may have changed
+user = DBConnector.getUser(user.getUid());
+session.setAttribute(MyServletUtil.SESS_USER, user);
+
 String msg =(String)request.getAttribute("msg");
 String photoUrl = (String)request.getAttribute("photoUrl");
 if(msg!=null && !msg.isEmpty()){

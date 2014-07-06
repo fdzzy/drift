@@ -15,6 +15,7 @@ import org.json.simple.JSONArray;
 
 import com.drift.core.ChatMessage;
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
 import com.drift.core.User;
 
 /**
@@ -34,6 +35,7 @@ public class SendReceiveMessage extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		MyServletUtil.setCharacterEncoding(request, response);
 		
@@ -61,7 +63,10 @@ public class SendReceiveMessage extends HttpServlet {
 		User friend = null;
 		if(action == null) {
 			List<ChatMessage> messages = null;
-			messages = DBConnector.getConversation(user.getUid(), friendId);
+			DBResult result = DBConnector.getConversation(user.getUid(), friendId);
+			if(result.getCode() == DBConnector.DB_STATUS_OK) {
+				messages = (List<ChatMessage>) result.getResultObject();
+			}
 			friend = DBConnector.getUser(friendId);
 			
 			request.setAttribute("friend", friend);
@@ -69,7 +74,10 @@ public class SendReceiveMessage extends HttpServlet {
 			getServletContext().getRequestDispatcher("/chat.jsp").forward(request, response);
 		} else if(action.equals("receive")) {
 			List<ChatMessage> messages = null;
-			messages = DBConnector.getNewMessagesFromFriend(user.getUid(), friendId);
+			DBResult result = DBConnector.getNewMessagesFromFriend(user.getUid(), friendId);
+			if(result.getCode() == DBConnector.DB_STATUS_OK) {
+				messages = (List<ChatMessage>) result.getResultObject();
+			}
 			
 			JSONArray array = new JSONArray();
 			for(ChatMessage msg : messages) {
@@ -80,9 +88,12 @@ public class SendReceiveMessage extends HttpServlet {
 			String content = (String) request.getParameter("content");
 			List<ChatMessage> messages = null;
 			int uid = user.getUid();
-			int result = DBConnector.sendMessage(uid, friendId, content);
-			if(result == DBConnector.DB_STATUS_OK) {
-				messages = DBConnector.getNewMessagesFromFriend(uid, friendId);
+			int rtval = DBConnector.sendMessage(uid, friendId, content);
+			if(rtval == DBConnector.DB_STATUS_OK) {
+				DBResult result = DBConnector.getNewMessagesFromFriend(uid, friendId);
+				if(result.getCode() == DBConnector.DB_STATUS_OK) {
+					messages = (List<ChatMessage>) result.getResultObject();
+				}
 				messages.add(new ChatMessage(0, uid, friendId, new Timestamp(System.currentTimeMillis()), content));
 				JSONArray array = new JSONArray();
 				for(ChatMessage msg : messages) {

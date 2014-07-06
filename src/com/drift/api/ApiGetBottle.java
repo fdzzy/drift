@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.Bottle;
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
 import com.drift.util.JSONUtil;
 
 /**
@@ -34,42 +35,37 @@ public class ApiGetBottle extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
-		int uid = 0;
+		
+		if(uidStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
+		} else {
+			int uid = 0;
 
-		try {
-			uid = Integer.parseInt(uidStr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			try {
+				uid = Integer.parseInt(uidStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
-		final int SUCCESS = 200;
-		final int ERR_UNKOWN = 201;
-		final int ERR_BAD_ARGS = 202;
-		final int ERR_NO_BOTTLE = 203; 
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		if(uid > 0) {
-			Bottle bottle = DBConnector.getBottle(uid);
-			if(bottle != null) {
-				status = SUCCESS;
-				map.put("message", "Succeed");
+			Bottle bottle = null;
+			DBResult result = DBConnector.getBottle(uid);
+			status = ApiController.mapDBCode(result.getCode());
+			if(status == ApiController.API_ACTION_OK) {
+				bottle = (Bottle) result.getResultObject();
 				map.put("bottleID", bottle.getBottleId());
 				map.put("content", bottle.getContent());
 				map.put("senderID", bottle.getSenderId());
 				map.put("senderName", bottle.getSenderName());
-			} else {
-				status = ERR_NO_BOTTLE;
-				map.put("result", "No Bottle");
 			}
-		} else {
-			status = ERR_BAD_ARGS;
-			map.put("result", "Bad Arguments");
 		}
+		
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
 		PrintWriter out = response.getWriter();

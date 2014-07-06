@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
 import com.drift.util.JSONUtil;
 
 /**
@@ -33,41 +34,47 @@ public class ApiGetUnread extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
 		String friendIdStr = request.getParameter("friendId");
-		int uid = 0, friendId = 0;
-		try {
-			uid = Integer.parseInt(uidStr);
-			friendId = Integer.parseInt(friendIdStr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		final int SUCCESS = 510;
-		final int ERR_UNKOWN = 511;
-		//final int ERR_BAD_ARGS = 512;
-		//final int ERR_NO_SUCH_USER = 513;
-		final int ERR_NO_MESSAGES = 514;
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		List<ChatMessage> messages = null;
-		messages = DBConnector.getNewMessagesFromFriend(uid, friendId);
-
-		if(messages == null || messages.isEmpty()) {
-			status = ERR_NO_MESSAGES;
-			map.put("result", "No messages");
+		if(uidStr == null || friendIdStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
 		} else {
-			status = SUCCESS;
-			map.put("result", "Succeed");
-			map.put("messages", messages);
-		}
+			int uid = 0, friendId = 0;
+			try {
+				uid = Integer.parseInt(uidStr);
+				friendId = Integer.parseInt(friendIdStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
+			if(uid <= 0 || (DBConnector.checkUser(uid) ==  false)) {
+				status = ApiController.API_ERR_BAD_USER_ID;
+			} else if(friendId <= 0 || (DBConnector.checkUser(friendId) == false)) {
+				status = ApiController.API_ERR_BAD_FRIEND_ID;
+			} else {
+				List<ChatMessage> messages = null;
+				DBResult result = DBConnector.getNewMessagesFromFriend(uid, friendId);
+				status = ApiController.mapDBCode(result.getCode());
+
+				if(status == ApiController.API_ACTION_OK) {
+					messages = (List<ChatMessage>) result.getResultObject();
+					if(messages == null || messages.isEmpty()) {
+						status = ApiController.API_ERR_NO_MESSAGE;
+					} else {
+						map.put("messages", messages);
+					}
+				}
+			}
+		}
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
 		PrintWriter out = response.getWriter();

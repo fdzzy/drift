@@ -33,45 +33,34 @@ public class ApiViewPhoto extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
-		int uid = 0;
-		try {
-			uid = Integer.parseInt(uidStr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		final int SUCCESS = 420;
-		final int ERR_UNKOWN = 421;
-		//final int ERR_BAD_ARGS = 422;
-		final int ERR_NO_SUCH_USER = 423;
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		PrintWriter out = response.getWriter();
-		if(uid <= 0) {
-			map.put("code", status);
-			out.print(JSONUtil.toJSONString(map));
-			out.flush();
-			return;
-		}
-
-		String photoUrl = DBConnector.getPhotoUrl(uid);
-
-		if(photoUrl == null) {
-			status = ERR_NO_SUCH_USER;
-			map.put("result", "User not exist");
+		if(uidStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
 		} else {
-			status = SUCCESS;
-			map.put("result", "Succeed");
-			map.put("photoUrl", photoUrl);
-		}
+			int uid = 0;
+			try {
+				uid = Integer.parseInt(uidStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
+			String photoUrl = DBConnector.getPhotoUrl(uid);
+			if(photoUrl == null) {
+				status = ApiController.API_ERR_BAD_USER_ID;
+			} else {
+				status = ApiController.API_ACTION_OK;
+				map.put("photoUrl", photoUrl);
+			}
+		}
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
+		PrintWriter out = response.getWriter();
 		out.print(JSONUtil.toJSONString(map));
 		out.flush();
 	}

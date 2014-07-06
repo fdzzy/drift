@@ -1,6 +1,7 @@
 package com.drift.servlet;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.Bottle;
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
 import com.drift.core.User;
 
 /**
@@ -37,7 +39,11 @@ public class GetBottleServlet extends HttpServlet {
 		}
 		
 		Bottle bottle = null;
-		bottle = DBConnector.getBottle(user.getUid());
+		DBResult result = DBConnector.getBottle(user.getUid());
+		
+		if(result.getCode() == DBConnector.DB_STATUS_OK) {
+			bottle = (Bottle) result.getResultObject();
+		}
 		
 		request.setAttribute("user", user);
 		request.setAttribute("bottle", bottle);

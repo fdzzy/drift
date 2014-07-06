@@ -33,6 +33,8 @@ public class ApiEditProfile extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
 		String nickname = request.getParameter("nickname");
@@ -42,36 +44,24 @@ public class ApiEditProfile extends HttpServlet {
 		String major = request.getParameter("major");
 		String enrollYear = request.getParameter("enrollYear");
 
-		int uid = 0;
-		try {
-			uid = Integer.parseInt(uidStr);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(uidStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
+		} else {
+			int uid = 0;
+			
+			try {
+				uid = Integer.parseInt(uidStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			int rtval = DBConnector.DB_STATUS_ERR_GENERIC;
+			rtval = DBConnector.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
+			status = ApiController.mapDBCode(rtval);
 		}
-
-		final int SUCCESS = 400;
-		final int ERR_UNKOWN = 401;
-		final int ERR_BAD_ARGS = 402;
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		int rtval = DBConnector.DB_STATUS_ERR_GENERIC;
-		rtval = DBConnector.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
-
-		switch (rtval) {
-		case DBConnector.DB_STATUS_OK:
-			status = SUCCESS;
-			map.put("result", "Succeed");
-			break;
-		case DBConnector.DB_STATUS_ERR_BAD_ARGS:
-			status = ERR_BAD_ARGS;
-			map.put("result", "Bad Arguments");
-			break;
-		default:
-			map.put("result", "Unknown Error");
-		}
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 		map.put("code", status);
+		map.put("result", msg);
 		//System.out.println(status);
 
 		PrintWriter out = response.getWriter();

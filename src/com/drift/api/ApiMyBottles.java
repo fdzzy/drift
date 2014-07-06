@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
 import com.drift.util.JSONUtil;
 
 /**
@@ -35,48 +36,39 @@ public class ApiMyBottles extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ApiController.setCharacterEncoding(request, response);
+		int status = ApiController.API_ERR_OTHER;
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
-		//String content = request.getParameter("content");
-		int uid = 0;
-
-		try {
-			uid = Integer.parseInt(uidStr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		final int SUCCESS = 300;
-		final int ERR_UNKOWN = 301;
-		final int ERR_BAD_ARGS = 302;
-		final int ERR_NO_BOTTLES = 303;	
-
-		int status = ERR_UNKOWN;
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		PrintWriter out = response.getWriter();
-		if(uid <= 0) {
-			status = ERR_BAD_ARGS;
-			map.put("result", "Bad Arguments");
-			map.put("code", status);
-			out.print(JSONUtil.toJSONString(map));
-			out.flush();
-			return;
-		}
-
-		List<ChatMessage> messages = DBConnector.getMyBottles(uid, 0, 30);
-
-		if (messages == null || messages.isEmpty()) {
-			status = ERR_NO_BOTTLES;
-			map.put("result", "No bottles");
+		if(uidStr == null) {
+			status = ApiController.API_ERR_BAD_ARGS;
 		} else {
-			status = SUCCESS;
-			map.put("result", "Succeed");
-			map.put("bottles", messages);
-		}
-		map.put("code", status);
-		//System.out.println(status);
+			int uid = 0;
 
+			try {
+				uid = Integer.parseInt(uidStr);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			DBResult result = DBConnector.getMyBottles(uid, 0, 30);
+			status = ApiController.mapDBCode(result.getCode());
+			//System.out.println(status + " " + result.getCode());
+			if(status == ApiController.API_ACTION_OK) {
+				@SuppressWarnings("unchecked")
+				List<ChatMessage> messages = (List<ChatMessage>) result.getResultObject();
+				if(messages.isEmpty()) {
+					status = ApiController.API_ERR_NO_BOTTLE;
+				} else {
+					map.put("bottles", messages);
+				}
+			}
+		}
+		String msg = ApiController.API_CODE_STRINGS.get(status);
+		map.put("code", status);
+		map.put("result", msg);
+		
+		PrintWriter out = response.getWriter();
 		out.print(JSONUtil.toJSONString(map));
 		out.flush();
 	}

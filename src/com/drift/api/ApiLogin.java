@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.DBConnector;
 import com.drift.core.DBResult;
-import com.drift.servlet.MyServletUtil;
+import com.drift.core.User;
 import com.drift.util.JSONUtil;
 
 /**
@@ -39,17 +39,17 @@ public class ApiLogin extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		int status = MyServletUtil.API_CODE_LOGIN_ERR_UNKOWN;
+		int status = ApiController.API_ERR_OTHER;
 		DBResult result = DBConnector.login(username, password);
-		//System.out.println(result.getCode());
-		status = MyServletUtil.getLoginStatusCode(result.getCode());	
-		String msg = MyServletUtil.getLoginMessage(status);
+		status = ApiController.mapDBCode(result.getCode());
+		String msg = ApiController.API_CODE_STRINGS.get(status);
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("code", status);
 		map.put("result", msg);
-		if(status == MyServletUtil.API_CODE_LOGIN_SUCCEED) {
-			map.put("uid", result.getUser().getUid());
+		if(status == ApiController.API_ACTION_OK) {
+			User user = (User) result.getResultObject();
+			map.put("uid", user.getUid());
 		}
 		
 		PrintWriter out = response.getWriter();

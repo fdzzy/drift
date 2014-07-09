@@ -51,11 +51,11 @@ public class LoginServlet extends HttpServlet {
 		DBResult result = null;
 		
 		result = DBConnector.login(username, password);
-		User user = (User) result.getResultObject();
 		
 		switch (result.getCode()) {
 		case DBConnector.DB_STATUS_OK:
 			// login success
+			User user = (User) result.getResultObject();
 			HttpSession session = request.getSession();
 			session.setAttribute(MyServletUtil.SESS_USER, user);
 			page = MyServletUtil.mainJspPage;

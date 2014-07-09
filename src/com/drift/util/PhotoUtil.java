@@ -1,8 +1,15 @@
 package com.drift.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.List;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +22,66 @@ import com.drift.core.User;
 import com.drift.servlet.MyServletUtil;
 
 public class PhotoUtil {
+	
+	public static int downloadForeignPhoto(String address, String path, User user) {
+		
+		if(address == null || address.isEmpty() ||
+				path == null || path.isEmpty() || user == null) {
+			return DBConnector.DB_STATUS_ERR_BAD_ARGS;
+		}
+		
+		int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+		
+		int uid = user.getUid();
+		long currentTime = System.currentTimeMillis();
+		String dateStr = MyServletUtil.timestampToDate(user.getRegisterTs());			
+		String uploadPath = path + "/" + dateStr + "/" + uid; 
+		File userpath = new File(uploadPath);
+		System.out.println(userpath);
+		if(!userpath.exists())
+			userpath.mkdirs();
+		String newFileName = Long.toString(currentTime)+".jpg";
+		//System.out.println(newFileName);
+		dbStatus = DBConnector.setPhoto(uid, newFileName);					
+		urlDownload(address, uploadPath, newFileName);
+		FileUtil.limitFiles(uploadPath);
+		
+		return dbStatus;		
+	}
+	
+	private static void urlDownload(String urlAddress, String path, String filename) {
+		
+		OutputStream os = null;
+		InputStream is = null;
+		URLConnection uCon = null;
+		
+		System.out.println("Path is: " + path);
+		System.out.println("File name is: " + filename);
+		
+		try {
+			int byteRead, byteWritten = 0;
+			URL url = new URL(urlAddress);
+			byte[] buf = new byte[4096];
+			os = new BufferedOutputStream(new FileOutputStream(path + "/" + filename));
+
+			uCon = url.openConnection();
+			is = uCon.getInputStream();
+			while ((byteRead = is.read(buf)) != -1) {
+				os.write(buf,0,byteRead);
+				byteWritten += byteRead;
+			}
+			System.out.println("File length: " + byteWritten);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+				os.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public static int uploadPhoto(HttpServletRequest request, String path, int uid) {
 		

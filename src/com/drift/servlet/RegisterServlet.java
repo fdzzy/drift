@@ -1,13 +1,18 @@
 package com.drift.servlet;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.drift.core.DBConnector;
+import com.drift.core.DBResult;
+import com.drift.core.User;
+import com.drift.util.PhotoUtil;
 
 /**
  * Servlet implementation class RegisterServlet
@@ -35,9 +40,48 @@ public class RegisterServlet extends HttpServlet {
 				page = doRegister(request);
 			} else if (action.equals("activate")) {
 				page = doActivate(request);
+			} else if (action.equals("foreign_register")) {
+				page = doForeignRegister(request);
 			}
 		}
 		getServletContext().getRequestDispatcher(page).forward(request, response);
+	}
+
+	private String doForeignRegister(HttpServletRequest request) {
+		String page = MyServletUtil.loginJspPage;
+		
+		// Get all parameters
+		String birthday = request.getParameter("birthday");		//example: '1990-01-01'
+		String school = request.getParameter("school");
+		String department = request.getParameter("department");
+		String major = request.getParameter("major");
+		String enrollYear = request.getParameter("enrollYear");
+		String email = request.getParameter("email");
+		
+		String f_uid = request.getParameter("f_uid");
+		String username = request.getParameter("username");
+		String nickname = request.getParameter("nickname");
+		String imgUrl = request.getParameter("imgUrl");
+		String sex = request.getParameter("sex");
+		
+		DBResult result = DBConnector.registerForeign(DBConnector.USER_TYPE_SINA,
+			f_uid, username, nickname, sex, birthday, school, department,
+			major, enrollYear, email);
+		
+		if(result.getCode() == DBConnector.DB_STATUS_OK) {
+			User user = (User) result.getResultObject();
+			HttpSession session = request.getSession();
+			session.setAttribute(MyServletUtil.SESS_USER, user);
+			
+			String path = getServletContext().getRealPath("/photo"); //上传文件目录
+			PhotoUtil.downloadForeignPhoto(imgUrl, path, user);
+			
+			page = MyServletUtil.mainJspPage;
+		} else {
+			request.setAttribute("msg", "第三方注册错误");
+		}
+		
+		return page;
 	}
 
 	private String doActivate(HttpServletRequest request) {
@@ -87,9 +131,6 @@ public class RegisterServlet extends HttpServlet {
 		String major = request.getParameter("major");
 		String email = request.getParameter("email");
 		String enrollYear = request.getParameter("enrollYear");
-		
-		if(enrollYear==null || enrollYear.isEmpty())
-			enrollYear = 0 + "";
 		
 		if(username == null || username.isEmpty() ||
 		   password == null || password.isEmpty() || 

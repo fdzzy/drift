@@ -35,6 +35,13 @@ public class DBConnector {
 	public static final int DB_STATUS_ERR_USER_ID = -10;
 	public static final int DB_STATUS_ERR_BOTTLE_ID = -11;
 	
+	public static final int USER_TYPE_THIS_SITE = 0;
+	public static final int USER_TYPE_SINA = 1;
+	public static final int USER_TYPE_RENREN = 2;
+	public static final int USER_TYPE_QQ = 3;
+	public static final int USER_TYPE_BAIDU = 4;	
+	public static final int USER_TYPE_MAX = 5;	
+	
 	static DataSource ds = null;
 	
 /*	static private String DB_PROPS_PATH = "db.properties";
@@ -117,6 +124,43 @@ public class DBConnector {
 	}
 	
 	/*
+	 * Check if email exists already
+	 */
+	static public int checkEmail(String email){
+		Connection con=null;
+		PreparedStatement prepStmt=null;
+		ResultSet rs=null;
+		int result = DB_STATUS_ERR_GENERIC;
+		
+		if(email== null || email.isEmpty()) {
+			return DB_STATUS_ERR_BAD_ARGS;
+		}
+
+		try {
+			con=getConnection();
+			String selectStatement = "select ID from users where EMAIL=?";
+			prepStmt = con.prepareStatement(selectStatement);
+			prepStmt.setString(1, email);
+			rs = prepStmt.executeQuery();
+
+			if (rs.next()) {
+				//email exists in DB already
+				result = DB_STATUS_ERR_EMAIL_EXISTS;
+			} else {
+				result = DB_STATUS_OK;
+			}
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		}finally{
+			closeResultSet(rs);
+			closePrepStmt(prepStmt);
+			closeConnection(con);
+		}
+		
+		return result;		
+	}
+  
+	/*
 	 * Check if username exists already
 	 */
 	static public int checkUsername(String username){
@@ -125,9 +169,13 @@ public class DBConnector {
 		ResultSet rs=null;
 		int result = DB_STATUS_ERR_GENERIC;
 
+		if(username == null || username.isEmpty()) {
+			return DB_STATUS_ERR_BAD_ARGS;
+		}
+		
 		try {
 			con=getConnection();
-			String selectStatement = "select ID from users where NAME=?";
+			String selectStatement = "select ID from users where NAME=? and TYPE=0";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setString(1, username);
 			rs = prepStmt.executeQuery();
@@ -183,10 +231,13 @@ public class DBConnector {
 			sex == null || (!sex.equals("male") && !sex.equals("female"))) {
 			return DB_STATUS_ERR_BAD_ARGS;
 		}
+		
+		if(enrollYear == null || enrollYear.isEmpty())
+			enrollYear = 0 + "";
 
 		try {
 			con = getConnection();
-			String selectStatement = "select ID from users where NAME=?";
+			String selectStatement = "select ID from users where NAME=? and TYPE=0";
 			selectPrepStmt1 = con.prepareStatement(selectStatement);
 			selectPrepStmt1.setString(1, username);
 			selectRs1 = selectPrepStmt1.executeQuery();
@@ -276,6 +327,122 @@ public class DBConnector {
 		return result;
 	}
 
+	/* Register a Foreign site user into the DB
+	 * Args: username, password, sex, school, major, email
+	 *
+	 * Return value: and user
+	 *	0:		succeed
+	 *	< 0:	error
+	 */
+	static public DBResult registerForeign(int type,
+			String f_uid,
+			String username,
+			String nickname,
+			String sex,
+			String birthday,	/* caller's responsibility to make sure it's format is '1990-01-01' */
+			String school,
+			String department,
+			String major,
+			String enrollYear,
+			//String imgUrl,
+			String email) {
+		Connection con = null;
+		PreparedStatement selectPrepStmt1 = null;
+		ResultSet selectRs1 = null;
+		PreparedStatement selectPrepStmt2 = null;
+		ResultSet selectRs2 = null;
+		PreparedStatement insertPrepStmt = null;
+		PreparedStatement selectPrepStmt3 = null;
+		ResultSet selectRs3 = null;
+		DBResult result = new DBResult();
+		
+		if(type <= USER_TYPE_THIS_SITE || type >= USER_TYPE_MAX || 
+			f_uid == null || f_uid.isEmpty() ||
+			username == null || username.isEmpty() ||
+			email == null || email.isEmpty() ||
+			sex == null || (!sex.equals("male") && !sex.equals("female"))) {
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
+		}
+
+		if(enrollYear == null || enrollYear.isEmpty())
+			enrollYear = 0 + "";
+		
+		try {
+			con = getConnection();
+			String selectStatement = "select ID from users where TYPE=? and F_UID=?";
+			selectPrepStmt1 = con.prepareStatement(selectStatement);
+			selectPrepStmt1.setInt(1, type);
+			selectPrepStmt1.setString(2, f_uid);
+			selectRs1 = selectPrepStmt1.executeQuery();
+
+			if (selectRs1.next()) {
+				//user exists in DB already
+				result.setCode(DB_STATUS_ERR_USER_EXISTS);
+			} else {
+				selectStatement = "select ID from users where EMAIL=?";
+				selectPrepStmt2 = con.prepareStatement(selectStatement);
+				selectPrepStmt2.setString(1, email);
+				selectRs2 = selectPrepStmt2.executeQuery();
+
+				if(selectRs2.next()) {
+					//email exists in DB already
+					result.setCode(DB_STATUS_ERR_EMAIL_EXISTS);
+				} else {
+					String insertStatement = "insert into users (NAME, NICKNAME, SEX, BIRTHDAY, " + 
+							"SCHOOL, DEPARTMENT, MAJOR, ENROLLYEAR, EMAIL, REGISTER_TIME, ACTIVATED, " + 
+							"TYPE, F_UID) values " + 
+							"(?,?,?,?,?,?,?,?,?,NOW(),1,?,?)";
+					//System.out.println("Register: INSERT SQL String: " + insertStatement);
+					insertPrepStmt = con.prepareStatement(insertStatement);
+					insertPrepStmt.setString(1, username);
+					insertPrepStmt.setString(2, nickname);
+					insertPrepStmt.setString(3, sex);
+					insertPrepStmt.setString(4, birthday);
+					insertPrepStmt.setString(5, school);
+					insertPrepStmt.setString(6, department);
+					insertPrepStmt.setString(7, major);
+					insertPrepStmt.setString(8, enrollYear);
+					insertPrepStmt.setString(9, email);			
+					insertPrepStmt.setInt(10, type);			
+					insertPrepStmt.setString(11, f_uid);
+
+					if(insertPrepStmt.executeUpdate() != 0) {
+						selectStatement = "select ID from users where TYPE=? and F_UID=?";
+						selectPrepStmt3 = con.prepareStatement(selectStatement);
+						selectPrepStmt3.setInt(1, type);
+						selectPrepStmt3.setString(2, f_uid);
+						selectRs3 = selectPrepStmt3.executeQuery();
+
+						if(selectRs3.next()) {
+							int uid = selectRs3.getInt(1);
+							User user = getUser(uid);
+							result.setResultObject(user);
+							result.setCode(DB_STATUS_OK);
+						} else {
+							result.setCode(DB_STATUS_ERR_SQL);
+						}
+					} else {
+						result.setCode(DB_STATUS_ERR_SQL);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		}finally{
+			closeResultSet(selectRs3);
+			closeResultSet(selectRs2);
+			closeResultSet(selectRs1);
+			closePrepStmt(selectPrepStmt3);
+			closePrepStmt(selectPrepStmt2);
+			closePrepStmt(selectPrepStmt1);
+			closePrepStmt(insertPrepStmt);
+			closeConnection(con);
+		}
+
+		return result;
+	}
+
 	static public String getActivationCode(String username, String password, String sex,
 			String email, int uid, long ts) {
 		StringBuffer sb = new StringBuffer();
@@ -297,7 +464,7 @@ public class DBConnector {
 		
 		try {
 			con = getConnection();
-			String selectStatement = "select ID, NAME, PASSWORD, SEX, REGISTER_TIME from users where EMAIL=?";
+			String selectStatement = "select ID, NAME, PASSWORD, SEX, REGISTER_TIME from users where EMAIL=? and TYPE=0";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setString(1, email);
 			rs = prepStmt.executeQuery();
@@ -357,7 +524,7 @@ public class DBConnector {
 		try {
 			con=getConnection();
 			if(email == null) {  // login using username
-				String selectStatement = "select ID, PASSWORD, ACTIVATED from users where NAME=?";
+				String selectStatement = "select ID, PASSWORD, ACTIVATED from users where NAME=? and TYPE=0";
 				prepStmt = con.prepareStatement(selectStatement);
 				prepStmt.setString(1, username);
 				rs = prepStmt.executeQuery();
@@ -604,6 +771,52 @@ public class DBConnector {
 		return user;
 	}
  
+	/*
+	 * Get a foreign site user
+	 */
+	static public DBResult getForeignUser(int type, String f_uid) {
+		Connection con=null;
+		PreparedStatement prepStmt=null;
+		ResultSet rs=null;
+		User user = null;
+		DBResult result = new DBResult();
+		
+		if(type < 0 || f_uid == null || f_uid.isEmpty()) {
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
+		}
+
+		try {
+			con=getConnection();
+			String selectStatement = "select ID from users where TYPE=? and F_UID=?";
+			prepStmt = con.prepareStatement(selectStatement);
+			prepStmt.setInt(1, type);
+			prepStmt.setString(2, f_uid);
+			rs = prepStmt.executeQuery();
+
+			if (!rs.next()) {
+				//user name does not exist in DB
+				result.setCode(DB_STATUS_ERR_USER_NOT_EXIST);
+			} else {
+				int uid = rs.getInt(1);
+				user = getUser(uid);
+				if(user == null) {
+					result.setCode(DB_STATUS_ERR_SQL);
+				} else {
+					result.setResultObject(user);
+					result.setCode(DB_STATUS_OK);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		}finally{
+			closeResultSet(rs);
+			closePrepStmt(prepStmt);
+			closeConnection(con);
+		}
+		return result;
+	}
+
 	/*
 	 * check to see if the uid User exists
 	 */

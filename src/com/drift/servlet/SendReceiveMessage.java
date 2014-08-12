@@ -21,7 +21,7 @@ import com.drift.core.User;
 /**
  * Servlet implementation class SendReceiveMessage
  */
-@WebServlet("/send_receive")
+@WebServlet(urlPatterns = {"/send_receive"}, asyncSupported=true)
 public class SendReceiveMessage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

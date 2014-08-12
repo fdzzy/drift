@@ -32,7 +32,7 @@ public class ApiSendBottle extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.setCharacterEncoding(request, response);
+		ApiController.doCommonTasks(request, response);
 		int status = ApiController.API_ERR_OTHER;
 		Map<String, Object> map = new HashMap<String, Object>();
 		

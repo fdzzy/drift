@@ -32,7 +32,7 @@ public class ApiViewPhoto extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.setCharacterEncoding(request, response);
+		ApiController.doCommonTasks(request, response);
 		int status = ApiController.API_ERR_OTHER;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
@@ -48,6 +48,7 @@ public class ApiViewPhoto extends HttpServlet {
 			}
 
 			String photoUrl = DBConnector.getPhotoUrl(uid);
+			//System.out.println(photoUrl);
 			if(photoUrl == null) {
 				status = ApiController.API_ERR_BAD_USER_ID;
 			} else {

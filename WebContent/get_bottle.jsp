@@ -19,7 +19,7 @@
 
 Bottle bottle = (Bottle)request.getAttribute("bottle");
 
-if(user == null && bottle == null) {
+if(user == null || bottle == null) {
 	out.println("请稍后重试！");
 %>
   <a href="main.jsp">返回</a>

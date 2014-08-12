@@ -34,6 +34,7 @@ public class DBConnector {
 	public static final int DB_STATUS_ERR_USER_NOT_ACTIVATED = -9;
 	public static final int DB_STATUS_ERR_USER_ID = -10;
 	public static final int DB_STATUS_ERR_BOTTLE_ID = -11;
+	public static final int DB_STATUS_ERR_NO_BOTTLE = -12;
 	
 	public static final int USER_TYPE_THIS_SITE = 0;
 	public static final int USER_TYPE_SINA = 1;
@@ -985,6 +986,9 @@ public class DBConnector {
 						result.setResultObject(bottle);
 						result.setCode(DB_STATUS_OK);
 					}
+				} else {
+					// No bottle left
+					result.setCode(DB_STATUS_ERR_NO_BOTTLE);
 				}
 			} else {
 				//username does not exist in DB
@@ -1146,12 +1150,15 @@ public class DBConnector {
 				ChatMessage message = new ChatMessage(messageId, senderId, receiverId, ts, content);
 				messages.add(message);
 			}
+			/*
+			 * Do not set the readFlag until the message is read from chat.jsp or get_unread
 			String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `receiverID`=?"; 
 			updatePrepStmt = con.prepareStatement(updateStatement);
 			updatePrepStmt.setInt(1, uid);
 			if(updatePrepStmt.executeUpdate() != 0) {
 				// anything to do?
 			}
+			*/
 			result.setResultObject(messages);
 			result.setCode(DB_STATUS_OK);
 		} catch (Exception e) {

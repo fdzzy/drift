@@ -34,7 +34,7 @@ public class ApiLogin extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.setCharacterEncoding(request, response);
+		ApiController.doCommonTasks(request, response);
 		
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");

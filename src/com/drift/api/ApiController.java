@@ -96,6 +96,9 @@ public class ApiController {
 		case DBConnector.DB_STATUS_ERR_BOTTLE_ID:
 			code = API_ERR_BAD_BOTTLE_ID;
 			break;
+		case DBConnector.DB_STATUS_ERR_NO_BOTTLE:
+			code = API_ERR_NO_BOTTLE;
+			break;
 		default:
 			code = API_ERR_OTHER;
 			break;
@@ -104,10 +107,12 @@ public class ApiController {
 		return code;
 	}
 	
-	public static void setCharacterEncoding(HttpServletRequest request, HttpServletResponse response)
+	public static void doCommonTasks(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		MyServletUtil.setCharacterEncoding(request, response);
 		response.setContentType("application/json");
+		
+		response.setHeader("Access-Control-Allow-Origin", "*");
 	}
 
 }

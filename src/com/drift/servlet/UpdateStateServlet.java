@@ -47,6 +47,7 @@ public class UpdateStateServlet extends HttpServlet {
 		//onlineUsers.add(user);
 		int messageCount = 0;
 		messageCount = DBConnector.getNewMessageCount(user.getUid());
+		//System.out.println(messageCount);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("newMessageCount", messageCount);

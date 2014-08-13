@@ -1147,7 +1147,11 @@ public class DBConnector {
 				Timestamp ts = rs.getTimestamp(4);
 				String content = rs.getString(5);
 				
-				ChatMessage message = new ChatMessage(messageId, senderId, receiverId, ts, content);
+				User senderUser = getUser(senderId);
+				User receiverUser = getUser(receiverId);
+				
+				ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
+						receiverId, receiverUser.getUsername(), ts, content);
 				messages.add(message);
 			}
 			/*
@@ -1210,7 +1214,12 @@ public class DBConnector {
 				int readFlag = rs.getInt(6);
 				Timestamp ts = rs.getTimestamp(4);
 				String content = rs.getString(5);
-				ChatMessage message = new ChatMessage(messageId, senderId, receiverId, ts, content);
+				
+				User senderUser = getUser(senderId);
+				User receiverUser = getUser(receiverId);
+				
+				ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
+						receiverId, receiverUser.getUsername(), ts, content);
 				messages.add(message);
 				// set readFlag to 1
 				if(readFlag == 0) {
@@ -1268,11 +1277,16 @@ public class DBConnector {
 				int receiverId = rs.getInt(3);
 				Timestamp ts = rs.getTimestamp(4);
 				String content = rs.getString(5);
+				
+				User senderUser = getUser(senderId);
+				User receiverUser = getUser(receiverId);
+				
 				String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `ID`=?"; 
 				prepStmt = con.prepareStatement(updateStatement);
 				prepStmt.setInt(1, messageId);
 				if(prepStmt.executeUpdate() != 0) {
-					ChatMessage message = new ChatMessage(messageId, senderId, receiverId, ts, content);
+					ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
+							receiverId, receiverUser.getUsername(), ts, content);
 					messages.add(message);
 				}				
 			}
@@ -1314,6 +1328,90 @@ public class DBConnector {
 		}finally{
 			closeResultSet(rs);
 			closePrepStmt(prepStmt);
+			closeConnection(con);
+		}
+		return result;
+	}
+	
+	/*
+	 *  getNotification
+	 *  
+	 *  get unread messages, containing the a list of following information:
+	 *  	friendId: the user id from which the unread message belongs to
+	 *  	ts: the newest timestamp
+	 *  	content: the last message body
+	 *  	unreadCount: number of unread messages from him/her
+	 *  	
+	 */
+	static public DBResult getNotification(int uid)
+	{
+		Connection con = null;
+		PreparedStatement prepStmt1 = null;
+		PreparedStatement prepStmt2 = null;
+		PreparedStatement prepStmt3 = null;
+		ResultSet rs1 = null;
+		ResultSet rs2 = null;
+		ResultSet rs3 = null;
+		DBResult result = new DBResult();
+		List<NotificationMessage> notifications = new ArrayList<>();
+		
+		if(uid <= 0) {
+			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+			return result;
+		}
+
+		try {
+			con=getConnection();
+			String selectStatement1 = "SELECT DISTINCT senderID FROM messages WHERE receiverID=? AND readFlag=0";
+			prepStmt1 = con.prepareStatement(selectStatement1);
+			prepStmt1.setInt(1, uid);
+			rs1 = prepStmt1.executeQuery();
+
+			String selectStatement2 = "SELECT COUNT(*) FROM messages WHERE senderID=? AND receiverID=? AND readFlag=0";
+			prepStmt2 = con.prepareStatement(selectStatement2);
+			
+			String selectStatement3 = "SELECT sendTime, content FROM messages WHERE " +
+					"senderID=? AND receiverID=? AND readFlag=0 ORDER BY sendTime DESC LIMIT 0,1";
+			prepStmt3 = con.prepareStatement(selectStatement3);
+			
+			while (rs1.next()) {
+				int senderID = rs1.getInt(1);
+				NotificationMessage message = new NotificationMessage();
+				message.setSenderId(senderID);
+				User sender = getUser(senderID);
+				message.setSenderName(sender.getUsername());
+				
+				prepStmt2.setInt(1, senderID);
+				prepStmt2.setInt(2, uid);
+				rs2 = prepStmt2.executeQuery();
+				int unreadCount = 0;
+				if(rs2.next()) {
+					unreadCount = rs2.getInt(1);
+					message.setUnreadCount(unreadCount);
+				}
+				
+				prepStmt3.setInt(1, senderID);
+				prepStmt3.setInt(2, uid);
+				rs3 = prepStmt3.executeQuery();
+				if(rs3.next()) {
+					Timestamp ts = rs3.getTimestamp(1);
+					String content = rs3.getString(2);
+					message.setTs(ts);
+					message.setContent(content);					
+				}
+				notifications.add(message);
+			}
+			result.setResultObject(notifications);
+			result.setCode(DB_STATUS_OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			closeResultSet(rs3);
+			closeResultSet(rs2);
+			closeResultSet(rs1);
+			closePrepStmt(prepStmt3);
+			closePrepStmt(prepStmt2);
+			closePrepStmt(prepStmt1);
 			closeConnection(con);
 		}
 		return result;

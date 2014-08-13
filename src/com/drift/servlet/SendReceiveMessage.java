@@ -88,13 +88,15 @@ public class SendReceiveMessage extends HttpServlet {
 			String content = (String) request.getParameter("content");
 			List<ChatMessage> messages = null;
 			int uid = user.getUid();
+			friend = DBConnector.getUser(friendId);
 			int rtval = DBConnector.sendMessage(uid, friendId, content);
 			if(rtval == DBConnector.DB_STATUS_OK) {
 				DBResult result = DBConnector.getNewMessagesFromFriend(uid, friendId);
 				if(result.getCode() == DBConnector.DB_STATUS_OK) {
 					messages = (List<ChatMessage>) result.getResultObject();
 				}
-				messages.add(new ChatMessage(0, uid, friendId, new Timestamp(System.currentTimeMillis()), content));
+				messages.add(new ChatMessage(0, uid, user.getUsername(), friendId, friend.getUsername(),
+						new Timestamp(System.currentTimeMillis()), content));
 				JSONArray array = new JSONArray();
 				for(ChatMessage msg : messages) {
 					array.add(msg);

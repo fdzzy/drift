@@ -10,43 +10,20 @@ import java.util.Map;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
-public class ChatMessage implements Serializable, JSONAware {	
+public class NotificationMessage implements Serializable, JSONAware {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int messageId;
-	private int senderId;
-	private String senderName;
-	private int receiverId;
-	private String receiverName;
-	private Timestamp ts;
-	private String content;	
 	
-	public ChatMessage(int messageId, int senderId, String senderName, int receiverId, String receiverName,
-			Timestamp ts, String content) {
-		super();
-		this.messageId = messageId;
-		this.senderId = senderId;
-		this.senderName = senderName;
-		this.receiverId = receiverId;
-		this.receiverName = receiverName;
-		this.ts = ts;
-		this.content = content;
-	}
+	//private int uid = 0;
+	private int senderId = 0;
+	private String senderName = null;
+	private String content = null;
+	private Timestamp ts = null;
+	private int unreadCount = 0;
 	
-	ChatMessage() {		
-	}
-
-	public int getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(int messageId) {
-		this.messageId = messageId;
-	}
-
 	public int getSenderId() {
 		return senderId;
 	}
@@ -54,37 +31,13 @@ public class ChatMessage implements Serializable, JSONAware {
 	public void setSenderId(int senderId) {
 		this.senderId = senderId;
 	}
-	
+
 	public String getSenderName() {
 		return senderName;
 	}
-	
+
 	public void setSenderName(String senderName) {
 		this.senderName = senderName;
-	}
-
-	public int getReceiverId() {
-		return receiverId;
-	}
-
-	public void setReceiverId(int receiverId) {
-		this.receiverId = receiverId;
-	}
-	
-	public String getReceiverName() {
-		return receiverName;
-	}
-	
-	public void setReceiverName(String receiverName) {
-		this.receiverName = receiverName;
-	}
-
-	public Timestamp getTs() {
-		return ts;
-	}
-
-	public void setTs(Timestamp ts) {
-		this.ts = ts;
 	}
 
 	public String getContent() {
@@ -95,6 +48,33 @@ public class ChatMessage implements Serializable, JSONAware {
 		this.content = content;
 	}
 
+	public Timestamp getTs() {
+		return ts;
+	}
+
+	public void setTs(Timestamp ts) {
+		this.ts = ts;
+	}
+
+	public int getUnreadCount() {
+		return unreadCount;
+	}
+
+	public void setUnreadCount(int unreadCount) {
+		this.unreadCount = unreadCount;
+	}
+	
+	public NotificationMessage() {
+	}
+	
+	public NotificationMessage(int senderID, String senderName, String content, Timestamp ts, int unreadCount) {
+		this.senderId = senderID;
+		this.senderName = senderName;
+		this.content = content;
+		this.ts = ts;
+		this.unreadCount = unreadCount;
+	}
+
 	@Override
 	public String toJSONString() {
 		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -103,10 +83,9 @@ public class ChatMessage implements Serializable, JSONAware {
 		
 		map.put("senderId", senderId);
 		map.put("senderName", senderName);
-		map.put("receiverId", receiverId);
-		map.put("receiverName", receiverName);
 		map.put("content", content);
 		map.put("ts", sdf.format(ts));
+		map.put("unreadCount", unreadCount);
 		
 		JSONObject obj = new JSONObject(map);
 		
@@ -116,9 +95,7 @@ public class ChatMessage implements Serializable, JSONAware {
 		//obj.put("ts", sdf.format(ts));
 		return obj.toJSONString();
 	}
-
-
 	
-
+	
 
 }

@@ -19,6 +19,12 @@
 function openwin() {
 	window.open("edit_photo.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
 }
+function openwin2() {
+	window.open("edit_photo2.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
+}
+function openwin3() {
+	window.open("edit_photo3.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
+}
 -->
 </script>
 
@@ -64,13 +70,13 @@ style="cursor:pointer" alt="修改头像" title="修改头像"/>
 </p>
 <p>
 <center>
-<a href='#' onclick='openwin()'>修改头像</a>
+<a href='#' onclick='openwin()'>修改头像_form_data</a>
+<br/>
+<a href='#' onclick='openwin2()'>修改头像_octet_stream</a>
+<br/>
+<a href='#' onclick='openwin3()'>修改头像_form_data_base64</a>
 </center>
 </p>
-<!-- 
-<img src="photo/201406/patrickzzy/1401892670019.jpg" onclick='openwin()'
-style="cursor:pointer" alt="修改头像" title="修改头像"/>
--->
 </td>
 <td>
 &nbsp;

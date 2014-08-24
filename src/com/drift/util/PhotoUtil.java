@@ -146,4 +146,84 @@ public class PhotoUtil {
 		
 		return dbStatus;
 	}
+	
+	/*
+	 * This is used for the stream based upload, i.e. the xiuxiu uploadType 1
+	 */
+	public static int uploadPhoto2(HttpServletRequest request, String path, int uid) {
+		
+		int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+		
+		if(uid <=0 || request == null || path == null || path.isEmpty()) {
+			return DBConnector.DB_STATUS_ERR_BAD_ARGS;
+		}
+		
+		File tempPathFile = new File(path+"/tmp");
+		if (!tempPathFile.exists()) {
+			tempPathFile.mkdirs();
+		}
+		
+		try {
+			User user = DBConnector.getUser(uid);
+			
+			long currentTime = System.currentTimeMillis();
+			//String newFileName = user.getEmail()+"_"+Long.toString(currentTime)+".jpg";
+			String dateStr = MyServletUtil.timestampToDate(user.getRegisterTs());			
+			String uploadPath = path + "/" + dateStr + "/" + uid; 
+			File userpath = new File(uploadPath);
+			System.out.println(userpath);
+			if(!userpath.exists())
+				userpath.mkdirs();
+			String newFileName = Long.toString(currentTime)+".jpg";
+			//System.out.println(newFileName);
+			File savedFile = new File(userpath, newFileName);
+			System.out.println(userpath + "\\" + newFileName);
+			FileOutputStream fos = new FileOutputStream(savedFile);
+			
+			InputStream in = request.getInputStream();
+			int len;
+			byte buffer[] = new byte[4096];
+			while((len = in.read(buffer)) != -1) {
+				fos.write(buffer, 0, len);
+			}
+			fos.close();
+			
+			dbStatus = DBConnector.setPhoto(uid, newFileName);
+			FileUtil.limitFiles(uploadPath);
+			
+//			// Create a factory for disk-based file items
+//			DiskFileItemFactory factory = new DiskFileItemFactory();
+//
+//			// Set factory constraints
+//			factory.setSizeThreshold(4096); // 设置缓冲区大小，这里是4kb
+//			factory.setRepository(tempPathFile);//设置缓冲区目录
+//
+//			// Create a new file upload handler
+//			ServletFileUpload upload = new ServletFileUpload(factory);
+//
+//			// Set overall request size constraint
+//			upload.setSizeMax(524288);  // 设置最大文件尺寸，这里是512KB
+//
+//			List<FileItem> items = upload.parseRequest(request);//得到所有的文件
+//			Iterator<FileItem> i = items.iterator();
+//			//PhotoHandler photoHandler = new LocalPhotoHandler();
+//
+//			while (i.hasNext()) {
+//				//System.out.println("hasNext:");
+//				FileItem fi = (FileItem) i.next();
+//				String fileName = fi.getName();
+//				//System.out.println(fileName);
+//				if (fileName != null) {
+//					//File fullFile = new File(fi.getName());
+//					//System.out.println(fullFile);
+//					dbStatus = DBConnector.setPhoto(uid, newFileName);					
+//					FileUtil.limitFiles(uploadPath);
+//				}
+//			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return dbStatus;
+	}
 }

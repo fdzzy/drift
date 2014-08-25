@@ -1199,7 +1199,7 @@ public class DBConnector {
 			con=getConnection();
 			String selectStatement = "select ID, senderID, receiverID, sendTime, content, readFlag " + 
 					" from messages where (receiverID=? and senderID=?) or (receiverID=? and " + 
-					"senderID=?) order by sendTime DESC, ID DESC limit 0, 30";
+					"senderID=?) order by sendTime ASC, ID ASC";// limit 0, 30";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setInt(1, uid);
 			prepStmt.setInt(2, friendId);
@@ -1265,7 +1265,7 @@ public class DBConnector {
 			con=getConnection();
 			String selectStatement = "select ID, senderID, receiverID, sendTime, content, readFlag " + 
 					" from messages where receiverID=? and senderID=? and readFlag=0" + 
-					" order by sendTime DESC, ID DESC";
+					" order by sendTime ASC, ID ASC";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setInt(1, uid);
 			prepStmt.setInt(2, friendId);

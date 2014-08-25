@@ -212,7 +212,7 @@ String myPhotoUrl = DBConnector.getPhotoUrl(user.getUid());
 <%
 	int myUid = user.getUid();
 	DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	Collections.reverse(messages);
+	//Collections.reverse(messages);
 	for(ChatMessage msg : messages) {
 		String tsStr = null;
 		try {

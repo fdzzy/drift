@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.util.JSONUtil;
 
@@ -51,7 +51,7 @@ public class ApiMyBottles extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			DBResult result = DBConnector.getMyBottles(uid, 0, 30);
+			DBResult result = DAO.getMyBottles(uid, 0, 30);
 			status = ApiController.mapDBCode(result.getCode());
 			//System.out.println(status + " " + result.getCode());
 			if(status == ApiController.API_ACTION_OK) {

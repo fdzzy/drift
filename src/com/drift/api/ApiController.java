@@ -8,7 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.servlet.MyServletUtil;
 
 public class ApiController {
@@ -66,37 +66,37 @@ public class ApiController {
 		int code;
 		
 		switch (db_code) {
-		case DBConnector.DB_STATUS_OK:
+		case DAO.DB_STATUS_OK:
 			code = API_ACTION_OK;
 			break;
-		case DBConnector.DB_STATUS_ERR_BAD_ARGS:
+		case DAO.DB_STATUS_ERR_BAD_ARGS:
 			code = API_ERR_BAD_ARGS;
 			break;
-		case DBConnector.DB_STATUS_ERR_PASSWORD:
+		case DAO.DB_STATUS_ERR_PASSWORD:
 			code = API_ERR_PASSWORD;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_NOT_EXIST:
+		case DAO.DB_STATUS_ERR_USER_NOT_EXIST:
 			code = API_ERR_USERNAME_NOT_EXIST;
 			break;
-		case DBConnector.DB_STATUS_ERR_EMAIL_NOT_EXIST:
+		case DAO.DB_STATUS_ERR_EMAIL_NOT_EXIST:
 			code = API_ERR_EMAIL_NOT_EXIST;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_NOT_ACTIVATED:
+		case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
 			code = API_ERR_USER_NOT_ACTIVATED;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_EXISTS:
+		case DAO.DB_STATUS_ERR_USER_EXISTS:
 			code = API_ERR_USERNAME_UNAVALABLE;
 			break;
-		case DBConnector.DB_STATUS_ERR_EMAIL_EXISTS:
+		case DAO.DB_STATUS_ERR_EMAIL_EXISTS:
 			code = API_ERR_EMAIL_UNAVALABLE;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_ID:
+		case DAO.DB_STATUS_ERR_USER_ID:
 			code = API_ERR_BAD_USER_ID;
 			break;
-		case DBConnector.DB_STATUS_ERR_BOTTLE_ID:
+		case DAO.DB_STATUS_ERR_BOTTLE_ID:
 			code = API_ERR_BAD_BOTTLE_ID;
 			break;
-		case DBConnector.DB_STATUS_ERR_NO_BOTTLE:
+		case DAO.DB_STATUS_ERR_NO_BOTTLE:
 			code = API_ERR_NO_BOTTLE;
 			break;
 		default:

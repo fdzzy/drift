@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 
 /**
  * Servlet implementation class CheckUsernameServlet
@@ -40,10 +40,10 @@ public class CheckUsernameServlet extends HttpServlet {
 			return;
 		}		
 		
-		int result = DBConnector.DB_STATUS_ERR_GENERIC;
-		result = DBConnector.checkUsername(username);
+		int result = DAO.DB_STATUS_ERR_GENERIC;
+		result = DAO.checkUsername(username);
 		
-		if(result == DBConnector.DB_STATUS_OK) {
+		if(result == DAO.DB_STATUS_OK) {
 			out.print("true");
 		} else {
 			out.print("false");

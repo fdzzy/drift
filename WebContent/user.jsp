@@ -13,7 +13,7 @@
 </center></p><hr/>
 <center>
 <%
-User targetUser = null;
+	User targetUser = null;
 
 int id = Integer.parseInt(request.getParameter("id"));
 
@@ -21,8 +21,8 @@ int id = Integer.parseInt(request.getParameter("id"));
 
 int rtval = 0;
 String photoUrl = "";
-targetUser = DBConnector.getUser(id);
-photoUrl = DBConnector.getPhotoUrl(id);
+targetUser = DAO.getUser(id);
+photoUrl = DAO.getPhotoUrl(id);
 
 if(targetUser == null) {
 	out.println("请稍后重试！");

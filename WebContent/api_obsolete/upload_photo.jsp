@@ -2,7 +2,7 @@
 <%@page import="com.drift.util.JSONUtil"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -34,7 +34,7 @@
 	System.out.println(path);
 	int dbStatus = PhotoUtil.uploadPhoto(request, path, uid);
 	
-	if(dbStatus == DBConnector.DB_STATUS_OK) {
+	if(dbStatus == DAO.DB_STATUS_OK) {
 		status = SUCCESS;
 		map.put("result", "Succeed");
 	} else {

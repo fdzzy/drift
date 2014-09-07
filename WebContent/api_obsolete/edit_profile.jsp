@@ -1,7 +1,7 @@
 <%@page import="com.drift.util.JSONUtil"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -28,15 +28,15 @@
 	int status = ERR_UNKOWN;
 	Map<String, Object> map = new HashMap<String, Object>();
 	
-	int rtval = DBConnector.DB_STATUS_ERR_GENERIC;
-	rtval = DBConnector.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
+	int rtval = DAO.DB_STATUS_ERR_GENERIC;
+	rtval = DAO.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
 	
 	switch (rtval) {
-	case DBConnector.DB_STATUS_OK:
+	case DAO.DB_STATUS_OK:
 		status = SUCCESS;
 		map.put("result", "Succeed");
 		break;
-	case DBConnector.DB_STATUS_ERR_BAD_ARGS:
+	case DAO.DB_STATUS_ERR_BAD_ARGS:
 		status = ERR_BAD_ARGS;
 		map.put("result", "Bad Arguments");
 		break;

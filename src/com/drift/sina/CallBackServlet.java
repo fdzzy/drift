@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.servlet.MyServletUtil;
 
@@ -43,7 +43,20 @@ public class CallBackServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		
 		if(code == null || code.isEmpty()) {
-			// TODO: display error message
+			String error = request.getParameter("error_description");
+			if(error == null || error.isEmpty()) 
+				error = request.getParameter("error");
+			out.println("<html><head>");
+			out.println("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />");
+			out.println("</head><body>");
+			out.println("<font color='red' size='4'>");
+			out.println("<center>");
+			out.println("<b>错误信息：</b>" + error + "<br/>");
+			out.println("请<a href='login'>重新登录</a>");
+			out.println("</center>");
+			out.println("</font>");
+			out.println("</body></html>");
+			request.setAttribute("loginCheck", "fail");
 			return;
 		}
 		
@@ -93,10 +106,13 @@ public class CallBackServlet extends HttpServlet {
 			out.print("online status: " + weiboUser.getOnlineStatus() + "<br/>");
 			out.print("<img src='" + weiboUser.getAvatarLarge() + "' /><br/>");
 			*/
+			HttpSession session = request.getSession();
+			session.setAttribute(MyServletUtil.SESS_FOREIGN_UID, f_uid);
+			session.setAttribute(MyServletUtil.SESS_FOREIGN_ACCESS_TOKEN, accessTokenStr);
 			
-			DBResult result = DBConnector.getForeignUser(DBConnector.USER_TYPE_SINA, f_uid);
+			DBResult result = DAO.getForeignUser(DAO.USER_TYPE_SINA, f_uid);
 			switch (result.getCode()) {
-			case DBConnector.DB_STATUS_ERR_USER_NOT_EXIST:
+			case DAO.DB_STATUS_ERR_USER_NOT_EXIST:
 				//out.print("Weibo user not registered yet! redirect to register page<br/>");
 				request.setAttribute("f_uid", f_uid);
 				request.setAttribute("Name", weiboUser.getName());
@@ -105,11 +121,15 @@ public class CallBackServlet extends HttpServlet {
 				request.setAttribute("imgUrl", weiboUser.getAvatarLarge());
 				getServletContext().getRequestDispatcher("/third_party_register.jsp").forward(request, response);
 				break;
-			case DBConnector.DB_STATUS_OK:
+			case DAO.DB_STATUS_OK:
 				com.drift.core.User user = (com.drift.core.User) result.getResultObject();
-				HttpSession session = request.getSession();
 				session.setAttribute(MyServletUtil.SESS_USER, user);
-				getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
+				/*int rtval = DAO.updateForeignAccessToken(user.getUid(), accessTokenStr);
+				if(rtval != DAO.DB_STATUS_OK) {
+					System.err.println("Update access token failed!");
+				}*/
+				//getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
+				response.sendRedirect(getServletContext().getContextPath() + "/main.jsp");
 			default:
 				break;
 			}

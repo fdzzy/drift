@@ -2,7 +2,7 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.drift.core.DBResult"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -22,7 +22,7 @@
 		birthday = "1990-01-01";
 	
 	int status = MyServletUtil.API_CODE_REGISTER_ERR_UNKOWN;
-	DBResult result = DBConnector.register(username, nickname, password, sex, birthday, 
+	DBResult result = DAO.register(username, nickname, password, sex, birthday, 
 		school, department, major, enrollYear, email);
 	status = MyServletUtil.getRegisterStatusCode(result.getCode());	
 	String msg = MyServletUtil.getRegisterMessage(status);

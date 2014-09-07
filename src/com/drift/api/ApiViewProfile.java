@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.User;
 import com.drift.util.JSONUtil;
 
@@ -48,7 +48,7 @@ public class ApiViewProfile extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			User targetUser = DBConnector.getUser(uid);
+			User targetUser = DAO.getUser(uid);
 			if(targetUser == null) {
 				status = ApiController.API_ERR_BAD_USER_ID;
 			} else {

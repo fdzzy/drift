@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.User;
 
 /**
@@ -46,7 +46,7 @@ public class UpdateStateServlet extends HttpServlet {
 		
 		//onlineUsers.add(user);
 		int messageCount = 0;
-		messageCount = DBConnector.getNewMessageCount(user.getUid());
+		messageCount = DAO.getNewMessageCount(user.getUid());
 		//System.out.println(messageCount);
 		
 		Map<String, Object> map = new HashMap<String, Object>();

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 
 /**
  * Servlet implementation class CheckEmailServlet
@@ -39,10 +39,10 @@ public class CheckEmailServlet extends HttpServlet {
 			return;
 		}		
 		
-		int result = DBConnector.DB_STATUS_ERR_GENERIC;
-		result = DBConnector.checkEmail(email);
+		int result = DAO.DB_STATUS_ERR_GENERIC;
+		result = DAO.checkEmail(email);
 		
-		if(result == DBConnector.DB_STATUS_OK) {
+		if(result == DAO.DB_STATUS_OK) {
 			out.print("true");
 		} else {
 			out.print("false");

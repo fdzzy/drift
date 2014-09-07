@@ -1,9 +1,11 @@
 package com.drift.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -11,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.User;
 
 public final class MyServletUtil {
@@ -23,22 +25,47 @@ public final class MyServletUtil {
 	public static final String getBottleJspPage = "/get_bottle.jsp";
 	public static final String doPostBottleJspPage = "/do_post.jsp";
 	
-	
-	public static final String entryURL = "http://driftlove.duapp.com";
-	//public static final String entryURL = "http://localhost:8080/drift";
+	private static final String MY_SERVLET_UTIL_PROPS_PATH = "MyServletUtil.properties";
+	public static String entryURL = null;
+	//public final String entryURL = "http://localhost:8080/drift";
+
+	static {
+		//System.out.println(new File(".").getAbsolutePath());
+		//System.out.println(new File("/").getAbsolutePath());
+		//System.out.println(System.getProperty("user.dir"));
+		//System.out.println(getClass().getResource("/"));
+		Properties props = new Properties();
+		//String path = getClass().getResource("/") + DB_PROPS_PATH;
+		InputStream in = MyServletUtil.class.getClassLoader().getResourceAsStream(MY_SERVLET_UTIL_PROPS_PATH);
+		//System.out.println("path is: " + path);
+		//File file = new File(path);
+		try {
+			//props.load(new FileInputStream(file));
+			props.load(in);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		entryURL = props.getProperty("entryUrl");
+		//System.out.println("entry URL: " + entryURL);
+	}
+
+
 	
 	// SESSION Variable Constants
 	public static final String SESS_UID = "userId";			// Deprecated
 	public static final String SESS_USERNAME = "username";	// Deprecated
 	public static final String SESS_USER = "user";
+	public static final String SESS_FOREIGN_UID = "fuid";
+	public static final String SESS_FOREIGN_ACCESS_TOKEN = "accessToken";
+	
 	
 	// REQUEST Variable Constants
 	public static final String REQ_EDIT_PROFILE_USER_STRING = "user";
 	
-	public static DBConnector getDateDB(ServletContext context) throws Exception {
-		DBConnector dateDB = (DBConnector)context.getAttribute("dateDB");
+	public static DAO getDateDB(ServletContext context) throws Exception {
+		DAO dateDB = (DAO)context.getAttribute("dateDB");
 		if(dateDB == null) {
-			dateDB = new DBConnector();
+			dateDB = new DAO();
 			context.setAttribute("dateDB", dateDB);
 		}
 		return dateDB;
@@ -112,22 +139,22 @@ public final class MyServletUtil {
 		int code;
 		
 		switch (db_code) {
-		case DBConnector.DB_STATUS_OK:
+		case DAO.DB_STATUS_OK:
 			code = API_CODE_LOGIN_SUCCEED;
 			break;
-		case DBConnector.DB_STATUS_ERR_BAD_ARGS:
+		case DAO.DB_STATUS_ERR_BAD_ARGS:
 			code = API_CODE_LOGIN_BAD_ARGS;
 			break;
-		case DBConnector.DB_STATUS_ERR_PASSWORD:
+		case DAO.DB_STATUS_ERR_PASSWORD:
 			code = API_CODE_LOGIN_ERR_PASSWORD;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_NOT_EXIST:
+		case DAO.DB_STATUS_ERR_USER_NOT_EXIST:
 			code = API_CODE_LOGIN_USER_NOT_EXIST;
 			break;
-		case DBConnector.DB_STATUS_ERR_EMAIL_NOT_EXIST:
+		case DAO.DB_STATUS_ERR_EMAIL_NOT_EXIST:
 			code = API_CODE_LOGIN_EMAIL_NOT_EXIST;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_NOT_ACTIVATED:
+		case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
 			code = API_CODE_LOGIN_USER_NOT_ACTIVATED;
 			break;
 		default:
@@ -161,16 +188,16 @@ public final class MyServletUtil {
 		int code;
 		
 		switch (db_code) {
-		case DBConnector.DB_STATUS_OK:
+		case DAO.DB_STATUS_OK:
 			code = API_CODE_REGISTER_SUCCEED;
 			break;
-		case DBConnector.DB_STATUS_ERR_BAD_ARGS:
+		case DAO.DB_STATUS_ERR_BAD_ARGS:
 			code = API_CODE_REGISTER_BAD_ARGS;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_EXISTS:
+		case DAO.DB_STATUS_ERR_USER_EXISTS:
 			code = API_CODE_REGISTER_USER_EXIST;
 			break;
-		case DBConnector.DB_STATUS_ERR_EMAIL_EXISTS:
+		case DAO.DB_STATUS_ERR_EMAIL_EXISTS:
 			code = API_CODE_REGISTER_EMAIL_EXIST;
 			break;
 		default:

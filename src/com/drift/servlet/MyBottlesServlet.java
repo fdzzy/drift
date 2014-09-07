@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.core.User;
 
@@ -43,8 +43,8 @@ public class MyBottlesServlet extends HttpServlet {
 		
 		//Set<User> friends = null;
 		List<ChatMessage> messages = null;
-		DBResult result = DBConnector.getMyBottles(user.getUid(), 0, 30);
-		if(result.getCode() == DBConnector.DB_STATUS_OK) {
+		DBResult result = DAO.getMyBottles(user.getUid(), 0, 30);
+		if(result.getCode() == DAO.DB_STATUS_OK) {
 			messages = (List<ChatMessage>) result.getResultObject();
 		}
 		

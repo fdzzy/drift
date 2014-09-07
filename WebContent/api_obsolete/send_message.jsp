@@ -4,7 +4,7 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -28,15 +28,15 @@
 	int status = ERR_UNKOWN;
 	Map<String, Object> map = new HashMap<String, Object>();
 	
-	int result = DBConnector.sendMessage(uid, friendId, content);
+	int result = DAO.sendMessage(uid, friendId, content);
 	
 	//if(messages == null || messages.isEmpty()) {
 	switch (result) {
-	case DBConnector.DB_STATUS_ERR_BAD_ARGS:
+	case DAO.DB_STATUS_ERR_BAD_ARGS:
 		status = ERR_BAD_ARGS;
 		map.put("result", "Bad Arguments");
 		break;
-	case DBConnector.DB_STATUS_OK:
+	case DAO.DB_STATUS_OK:
 		status = SUCCESS;
 		map.put("result", "Succeed");
 		break;

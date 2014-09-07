@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.User;
 
 /**
@@ -40,11 +40,11 @@ public class PostBottleServlet extends HttpServlet {
 		System.out.println("\"" + user.getUsername() + "\"" + "发送了消息：\"" + content + "\"");
 		
 		int rtval = 0;
-		rtval = DBConnector.postBottle(user.getUid(), content);
+		rtval = DAO.postBottle(user.getUid(), content);
 		
 		String msg;
 		switch (rtval) {
-		case DBConnector.DB_STATUS_OK:
+		case DAO.DB_STATUS_OK:
 			msg = "<font color='green'>发送成功！</font>";
 			break;
 		default:

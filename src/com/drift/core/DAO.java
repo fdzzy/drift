@@ -19,7 +19,7 @@ import com.drift.util.MD5Util;
 import com.drift.util.SendEmail;
 
 
-public class DBConnector {
+public class DAO {
 	
 	// Error status code
 	public static final int DB_STATUS_OK = 0;
@@ -64,7 +64,7 @@ public class DBConnector {
 
 		Properties props = new Properties();
 		//String path = getClass().getResource("/") + DB_PROPS_PATH;
-		InputStream in = DBConnector.class.getClassLoader().getResourceAsStream(DB_PROPS_PATH);
+		InputStream in = DAO.class.getClassLoader().getResourceAsStream(DB_PROPS_PATH);
 		//System.out.println("path is: " + path);
 		//File file = new File(path);
 		try {
@@ -208,7 +208,7 @@ public class DBConnector {
 	static public int register(String username,
 			String nickname,
 			String password,
-			String sex,
+			int sex,
 			String birthday,	/* caller's responsibility to make sure it's format is '1990-01-01' */
 			String school,
 			String department,
@@ -229,7 +229,7 @@ public class DBConnector {
 		if(username == null || username.isEmpty() ||
 			password == null || password.isEmpty() ||
 			email == null || email.isEmpty() ||
-			sex == null || (!sex.equals("male") && !sex.equals("female"))) {
+			(sex != 0 && sex != 1)) {
 			return DB_STATUS_ERR_BAD_ARGS;
 		}
 		
@@ -270,7 +270,7 @@ public class DBConnector {
 			insertPrepStmt.setString(1, username);
 			insertPrepStmt.setString(2, nickname);
 			insertPrepStmt.setString(3, password);
-			insertPrepStmt.setString(4, sex);
+			insertPrepStmt.setInt(4, sex);
 			insertPrepStmt.setString(5, birthday);
 			insertPrepStmt.setString(6, school);
 			insertPrepStmt.setString(7, department);
@@ -339,7 +339,7 @@ public class DBConnector {
 			String f_uid,
 			String username,
 			String nickname,
-			String sex,
+			int sex,
 			String birthday,	/* caller's responsibility to make sure it's format is '1990-01-01' */
 			String school,
 			String department,
@@ -361,7 +361,7 @@ public class DBConnector {
 			f_uid == null || f_uid.isEmpty() ||
 			username == null || username.isEmpty() ||
 			email == null || email.isEmpty() ||
-			sex == null || (!sex.equals("male") && !sex.equals("female"))) {
+			(sex != 0 && sex != 1)) {
 			result.setCode(DB_STATUS_ERR_BAD_ARGS);
 			return result;
 		}
@@ -398,7 +398,7 @@ public class DBConnector {
 					insertPrepStmt = con.prepareStatement(insertStatement);
 					insertPrepStmt.setString(1, username);
 					insertPrepStmt.setString(2, nickname);
-					insertPrepStmt.setString(3, sex);
+					insertPrepStmt.setInt(3, sex);
 					insertPrepStmt.setString(4, birthday);
 					insertPrepStmt.setString(5, school);
 					insertPrepStmt.setString(6, department);
@@ -444,13 +444,13 @@ public class DBConnector {
 		return result;
 	}
 
-	static public String getActivationCode(String username, String password, String sex,
+	static public String getActivationCode(String username, String password, int sex,
 			String email, int uid, long ts) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(uid);
 		sb.append(email);
 		sb.append(username);
-		sb.append(sex);
+		sb.append(Gender.makeGender(sex).toString());
 		sb.append(password);
 		sb.append(ts);
 		return MD5Util.encode2hex(sb.toString());
@@ -477,7 +477,7 @@ public class DBConnector {
 				int uid = rs.getInt(1);
 				String username = rs.getString(2);
 				String password = rs.getString(3);
-				String sex = rs.getString(4);
+				int sex = rs.getInt(4);
 				java.sql.Timestamp timestamp = rs.getTimestamp(5);
 				
 				String activateCode = getActivationCode(username, password, sex, email, uid, timestamp.getTime());
@@ -749,7 +749,7 @@ public class DBConnector {
 			if (rs.next()) {
 				String name = rs.getString(1);
 				String nickname = rs.getString(2);
-				String sex = rs.getString(3);
+				int sex = rs.getInt(3);
 				String school = rs.getString(4);
 				String department = rs.getString(5);
 				String major = rs.getString(6);
@@ -758,7 +758,7 @@ public class DBConnector {
 				String enrollYear = rs.getString(9);
 				java.sql.Timestamp ts = rs.getTimestamp(10);
 				
-				user = new User(userId, name, nickname, sex, school, department, major, email, birthday, enrollYear, ts);
+				user = new User(userId, name, nickname, Gender.makeGender(sex), school, department, major, email, birthday, enrollYear, ts);
 			} else {
 				//username does not exist in DB
 			}
@@ -817,6 +817,63 @@ public class DBConnector {
 		}
 		return result;
 	}
+	
+	/*
+	 * Update the access token into the database
+	 */
+//	static public int updateForeignAccessToken(int uid, String token) {
+//		Connection con = null;
+//		PreparedStatement prepStmt1 = null;
+//		PreparedStatement prepStmt2 = null;
+//		ResultSet rs1 = null;
+//		ResultSet rs2 = null;
+//		
+//		int result = DB_STATUS_ERR_GENERIC;
+//		
+//		if(uid <= 0 || token == null || token.isEmpty()) {
+//			result = DB_STATUS_ERR_BAD_ARGS;
+//			return result;
+//		}
+//		
+//		try {
+//			con=getConnection();
+//			/* TODO: may need to reconsider this scheme, and to save some session variable instead of
+//			 * querying all these information every time
+//			 */
+//			String selectStatement = "SELECT TYPE, F_UID FROM users WHERE ID=?";
+//			prepStmt1 = con.prepareStatement(selectStatement);
+//			prepStmt1.setInt(1, uid);
+//			rs1 = prepStmt1.executeQuery();
+//			
+//			if(rs1.next()) {
+//				int type = rs1.getInt(1);
+//				String fUid = rs1.getString(2);
+//				String updateStatement = "REPLACE INTO `f_users` SET `TYPE`=?, `ID`=?, `AccessToken`=?";
+//				prepStmt2 = con.prepareStatement(updateStatement);
+//				prepStmt2.setInt(1, type);
+//				prepStmt2.setString(2, fUid);
+//				prepStmt2.setString(3, token);
+//				if(prepStmt2.executeUpdate() != 0) {
+//					result = DB_STATUS_OK;
+//				} else {
+//					result = DB_STATUS_ERR_SQL;
+//				}
+//			} else {
+//				result = DB_STATUS_ERR_SQL;
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}finally{
+//			closeResultSet(rs2);
+//			closeResultSet(rs1);
+//			closePrepStmt(prepStmt2);
+//			closePrepStmt(prepStmt1);
+//			closeConnection(con);
+//		}
+//		
+//		return result;
+//	}
 
 	/*
 	 * check to see if the uid User exists
@@ -915,12 +972,12 @@ public class DBConnector {
 			rs = prepStmt.executeQuery();
 			
 			if(rs.next()) {
-				String sex = rs.getString(1);
+				int sex = rs.getInt(1);
 				Timestamp ts = rs.getTimestamp(2);
 				String photoFilename = rs.getString(3);
 				
 				if(photoFilename == null || photoFilename.isEmpty()) {
-					url = "img/" + sex + ".jpg";
+					url = "img/" + Gender.makeGender(sex).toString() + ".jpg";
 				} else {
 					url = "photo/" + MyServletUtil.timestampToDate(ts) + "/" + uid
 							+ "/" + photoFilename;
@@ -947,7 +1004,7 @@ public class DBConnector {
 		PreparedStatement prepStmt2 = null;
 		ResultSet rs2 = null;
 		PreparedStatement updatePrepStmt = null;
-		String sex = null;
+		int sex = 0;
 		DBResult result = new DBResult();
 		Bottle bottle = null;
 		
@@ -965,12 +1022,13 @@ public class DBConnector {
 
 			if (rs.next()) {
 				//id = rs.getInt(1);
-				sex = rs.getString(1);
-				sex = sex.equals("male") ? "female" : "male";
+				sex = rs.getInt(1);
+				//sex = sex.equals("male") ? "female" : "male";
+				sex = sex ^ 1;
 				selectStatement = "select users.name, bottles.id, bottles.sender, bottles.content from bottles, users "
 						+ "where bottles.sender=users.id and users.sex=? and bottles.receiver=0 order by rand() limit 1";
 				prepStmt2 = con.prepareStatement(selectStatement);
-				prepStmt2.setString(1, sex);
+				prepStmt2.setInt(1, sex);
 				rs2 = prepStmt2.executeQuery();
 				if(rs2.next()) {
 					String senderName = rs2.getString(1);

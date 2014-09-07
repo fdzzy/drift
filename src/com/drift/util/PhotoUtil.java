@@ -17,7 +17,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.User;
 import com.drift.servlet.MyServletUtil;
 
@@ -27,10 +27,10 @@ public class PhotoUtil {
 		
 		if(address == null || address.isEmpty() ||
 				path == null || path.isEmpty() || user == null) {
-			return DBConnector.DB_STATUS_ERR_BAD_ARGS;
+			return DAO.DB_STATUS_ERR_BAD_ARGS;
 		}
 		
-		int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+		int dbStatus = DAO.DB_STATUS_ERR_GENERIC;
 		
 		int uid = user.getUid();
 		long currentTime = System.currentTimeMillis();
@@ -42,7 +42,7 @@ public class PhotoUtil {
 			userpath.mkdirs();
 		String newFileName = Long.toString(currentTime)+".jpg";
 		//System.out.println(newFileName);
-		dbStatus = DBConnector.setPhoto(uid, newFileName);					
+		dbStatus = DAO.setPhoto(uid, newFileName);					
 		urlDownload(address, uploadPath, newFileName);
 		FileUtil.limitFiles(uploadPath);
 		
@@ -85,10 +85,10 @@ public class PhotoUtil {
 	
 	public static int uploadPhoto(HttpServletRequest request, String path, int uid) {
 		
-		int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+		int dbStatus = DAO.DB_STATUS_ERR_GENERIC;
 		
 		if(uid <=0 || request == null || path == null || path.isEmpty()) {
-			return DBConnector.DB_STATUS_ERR_BAD_ARGS;
+			return DAO.DB_STATUS_ERR_BAD_ARGS;
 		}
 		
 		File tempPathFile = new File(path+"/tmp");
@@ -97,7 +97,7 @@ public class PhotoUtil {
 		}
 		
 		try {
-			User user = DBConnector.getUser(uid);
+			User user = DAO.getUser(uid);
 			
 			// Create a factory for disk-based file items
 			DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -136,7 +136,7 @@ public class PhotoUtil {
 					//System.out.println(newFileName);
 					File savedFile = new File(userpath, newFileName);
 					fi.write(savedFile);
-					dbStatus = DBConnector.setPhoto(uid, newFileName);					
+					dbStatus = DAO.setPhoto(uid, newFileName);					
 					FileUtil.limitFiles(uploadPath);
 				}
 			}
@@ -152,10 +152,10 @@ public class PhotoUtil {
 	 */
 	public static int uploadPhoto2(HttpServletRequest request, String path, int uid) {
 		
-		int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+		int dbStatus = DAO.DB_STATUS_ERR_GENERIC;
 		
 		if(uid <=0 || request == null || path == null || path.isEmpty()) {
-			return DBConnector.DB_STATUS_ERR_BAD_ARGS;
+			return DAO.DB_STATUS_ERR_BAD_ARGS;
 		}
 		
 		File tempPathFile = new File(path+"/tmp");
@@ -164,7 +164,7 @@ public class PhotoUtil {
 		}
 		
 		try {
-			User user = DBConnector.getUser(uid);
+			User user = DAO.getUser(uid);
 			
 			long currentTime = System.currentTimeMillis();
 			//String newFileName = user.getEmail()+"_"+Long.toString(currentTime)+".jpg";
@@ -188,7 +188,7 @@ public class PhotoUtil {
 			}
 			fos.close();
 			
-			dbStatus = DBConnector.setPhoto(uid, newFileName);
+			dbStatus = DAO.setPhoto(uid, newFileName);
 			FileUtil.limitFiles(uploadPath);
 			
 //			// Create a factory for disk-based file items
@@ -216,7 +216,7 @@ public class PhotoUtil {
 //				if (fileName != null) {
 //					//File fullFile = new File(fi.getName());
 //					//System.out.println(fullFile);
-//					dbStatus = DBConnector.setPhoto(uid, newFileName);					
+//					dbStatus = DAO.setPhoto(uid, newFileName);					
 //					FileUtil.limitFiles(uploadPath);
 //				}
 //			}

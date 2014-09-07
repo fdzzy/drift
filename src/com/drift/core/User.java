@@ -14,7 +14,7 @@ public class User implements Comparable<User>, JSONAware {
 	private int uid = 0;
 	private String username = null;
 	private String nickname = null;
-	private String sex = null;
+	private Gender sex = null;
 	private String school = null;
 	private String department = null;
 	private String major = null;
@@ -59,7 +59,7 @@ public class User implements Comparable<User>, JSONAware {
 	public User() {
 	}
 	
-	public User(int uid, String username, String nickname, String sex, String school, String department,
+	public User(int uid, String username, String nickname, Gender sex, String school, String department,
 			String major, String email, String birthday, String enrollYear, Timestamp ts)
 	{
 		this.uid = uid;
@@ -102,7 +102,7 @@ public class User implements Comparable<User>, JSONAware {
 		this.nickname = nickname;
 	}
 	
-	public void setSex(String sex) {
+	public void setSex(Gender sex) {
 		this.sex = sex;
 	}
 	
@@ -142,7 +142,7 @@ public class User implements Comparable<User>, JSONAware {
 		return nickname==null ? "" : nickname;
 	}
 	
-	public String getSex() {
+	public Gender getSex() {
 		return sex;
 	}
 	

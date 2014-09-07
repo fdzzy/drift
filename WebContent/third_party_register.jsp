@@ -116,13 +116,13 @@ String imgUrl = (String)request.getAttribute("imgUrl");
 </tr><tr>
 <% if(Gender.equals("m")) { %>
   <td>性别：</td><td>男</td>
-  <td><input type="hidden" name="sex" value="male" /></td>
+  <td><input type="hidden" name="sex" value="0" /></td>
 <% } else if(Gender.equals("f")) { %>
   <td>性别：</td><td>女</td>
-  <td><input type="hidden" name="sex" value="female" /></td>
+  <td><input type="hidden" name="sex" value="1" /></td>
 <% } else { %>
-  <td><input type="radio" name="sex" value="male" />男
-	  <input type="radio" name="sex" value="female"/>女
+  <td><input type="radio" name="sex" value="0" />男
+	  <input type="radio" name="sex" value="1"/>女
   </td>  <td>*</td>
 <%} %>
 </tr>

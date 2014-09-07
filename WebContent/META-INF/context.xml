@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Context  reloadable="true" >
+<Context  reloadable="true" allowLinking="true">
 	<Resource name="jdbc/DateDB" auth="Container" type="javax.sql.DataSource"
 		removeAbandoned="true" removeAbandonedTimeout="60" logAbandoned="true"
 		maxActive="1000" maxIdle="30" maxWait="10000"

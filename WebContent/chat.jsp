@@ -199,9 +199,8 @@ if(messages == null || friend == null) {
 	return;
 }
 
-String friendPhotoUrl = DBConnector.getPhotoUrl(friend.getUid()); 
-String myPhotoUrl = DBConnector.getPhotoUrl(user.getUid());
-
+String friendPhotoUrl = DAO.getPhotoUrl(friend.getUid()); 
+String myPhotoUrl = DAO.getPhotoUrl(user.getUid());
 %>
 
 <a href="user.jsp?id=<%=friend.getUid()%>">

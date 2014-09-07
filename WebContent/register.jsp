@@ -152,8 +152,8 @@ if(msg!=null && !msg.isEmpty()) {
   <td id="msg"></td>
  </tr><tr>
   <td>性别：</td>
-  <td><input type="radio" name="sex" value="male" />男
-	  <input type="radio" name="sex" value="female"/>女
+  <td><input type="radio" name="sex" value="0" />男
+	  <input type="radio" name="sex" value="1"/>女
   </td>  <td>*</td>
 </tr>
 <tr>

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.util.JSONUtil;
 
 /**
@@ -47,7 +47,7 @@ public class ApiViewPhoto extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			String photoUrl = DBConnector.getPhotoUrl(uid);
+			String photoUrl = DAO.getPhotoUrl(uid);
 			//System.out.println(photoUrl);
 			if(photoUrl == null) {
 				status = ApiController.API_ERR_BAD_USER_ID;

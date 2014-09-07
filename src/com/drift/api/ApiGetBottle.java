@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.Bottle;
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.util.JSONUtil;
 
@@ -52,7 +52,7 @@ public class ApiGetBottle extends HttpServlet {
 			}
 
 			Bottle bottle = null;
-			DBResult result = DBConnector.getBottle(uid);
+			DBResult result = DAO.getBottle(uid);
 			status = ApiController.mapDBCode(result.getCode());
 			if(status == ApiController.API_ACTION_OK) {
 				bottle = (Bottle) result.getResultObject();

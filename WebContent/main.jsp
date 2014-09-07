@@ -69,6 +69,20 @@ setInterval(updateState, 10000);
 <tr>
   <td><a href="edit_profile">修改资料</td>
 </tr>
+<%
+if(session.getAttribute(MyServletUtil.SESS_FOREIGN_UID) != null) {
+%>
+<tr>
+  <td><a href="get_keywords">获取微博关键字</td>
+</tr>
+<!-- 
+<tr>
+  <td>${sessionScope.accessToken}</td>
+</tr>
+ -->
+<%
+}
+%>
 <tr>
   <td><a href="logout.jsp">退出</td>
 </tr>

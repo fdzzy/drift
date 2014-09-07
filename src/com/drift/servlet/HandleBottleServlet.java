@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.core.User;
 
@@ -61,18 +61,18 @@ public class HandleBottleServlet extends HttpServlet {
 	private void handleReply(HttpServletRequest request,
 			HttpServletResponse response, int uid, int bottleId) throws ServletException,
 			IOException {			
-		int senderID = DBConnector.DB_STATUS_ERR_GENERIC;
+		int senderID = DAO.DB_STATUS_ERR_GENERIC;
 		
-		senderID = DBConnector.replyBottle(uid, bottleId);
+		senderID = DAO.replyBottle(uid, bottleId);
 		if(senderID > 0) {
 			//System.out.println(senderID);
 			List<ChatMessage> messages = null;
 			User friend = null;
-			DBResult result = DBConnector.getConversation(uid, senderID);
-			if(result.getCode() == DBConnector.DB_STATUS_OK) {
+			DBResult result = DAO.getConversation(uid, senderID);
+			if(result.getCode() == DAO.DB_STATUS_OK) {
 				messages = (List<ChatMessage>) result.getResultObject();
 			}
-			friend = DBConnector.getUser(senderID);
+			friend = DAO.getUser(senderID);
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);
 			getServletContext().getRequestDispatcher("/chat.jsp").forward(request, response);
@@ -83,9 +83,9 @@ public class HandleBottleServlet extends HttpServlet {
 	private void handleSendback(HttpServletRequest request,
 			HttpServletResponse response, int bottleId) throws ServletException,
 			IOException {			
-		int result = DBConnector.DB_STATUS_ERR_GENERIC;
-		result = DBConnector.setBottleUnread(bottleId);
-		if(result == DBConnector.DB_STATUS_OK) {
+		int result = DAO.DB_STATUS_ERR_GENERIC;
+		result = DAO.setBottleUnread(bottleId);
+		if(result == DAO.DB_STATUS_OK) {
 			getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
 		}
 	}

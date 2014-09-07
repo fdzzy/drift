@@ -74,15 +74,15 @@ setInterval(updateState, 10000);
 		int senderId = message.getSenderId();
 		int receiverId = message.getReceiverId();
 		int friendId = (receiverId == user.getUid()) ? senderId : receiverId;
-		User friend = DBConnector.getUser(friendId);
-		String photoUrl = DBConnector.getPhotoUrl(friendId);
+		User friend = DAO.getUser(friendId);
+		String photoUrl = DAO.getPhotoUrl(friendId);
 		out.println("<tr>");
 		out.println("<td><a href='user.jsp?id=" + friendId + "'><img src=" + photoUrl + " height='30' width='30'/>" 
-			+ friend.getUsername()  + "</a></td>");
+	+ friend.getUsername()  + "</a></td>");
 		out.println("<td>" + sdf.format(message.getTs()) + "</td>");
 		String content = message.getContent();
 		if(content.length() > 15) {
-			content = content.substring(0, 15);
+	content = content.substring(0, 15);
 		}
 		out.println("<td>" + content + "</td>");
 		out.println("<td><a href='send_receive?friend=" + friendId + "'>回复</a></td>");

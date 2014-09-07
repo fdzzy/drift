@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.util.JSONUtil;
 
 /**
@@ -55,8 +55,8 @@ public class ApiEditProfile extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			int rtval = DBConnector.DB_STATUS_ERR_GENERIC;
-			rtval = DBConnector.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
+			int rtval = DAO.DB_STATUS_ERR_GENERIC;
+			rtval = DAO.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
 			status = ApiController.mapDBCode(rtval);
 		}
 		String msg = ApiController.API_CODE_STRINGS.get(status);

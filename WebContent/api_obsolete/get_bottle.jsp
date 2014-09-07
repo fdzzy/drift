@@ -2,7 +2,7 @@
 <%@page import="com.drift.util.JSONUtil"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -25,17 +25,17 @@
 	Map<String, Object> map = new HashMap<String, Object>();
 	
 	if(uid > 0) {
-		Bottle bottle = DBConnector.getBottle(uid);
+		Bottle bottle = DAO.getBottle(uid);
 		if(bottle != null) {
-			status = SUCCESS;
-			map.put("message", "Succeed");
-			map.put("bottleID", bottle.getBottleId());
-			map.put("content", bottle.getContent());
-			map.put("senderID", bottle.getSenderId());
-			map.put("senderName", bottle.getSenderName());
+	status = SUCCESS;
+	map.put("message", "Succeed");
+	map.put("bottleID", bottle.getBottleId());
+	map.put("content", bottle.getContent());
+	map.put("senderID", bottle.getSenderId());
+	map.put("senderName", bottle.getSenderName());
 		} else {
-			status = ERR_NO_BOTTLE;
-			map.put("result", "No Bottle");
+	status = ERR_NO_BOTTLE;
+	map.put("result", "No Bottle");
 		}
 	} else {
 		status = ERR_BAD_ARGS;

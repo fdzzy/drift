@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.User;
 import com.drift.util.PhotoUtil;
 
@@ -45,7 +45,7 @@ public class UploadPhotoServlet extends HttpServlet {
 		System.out.println(path);
 		
 		int status = PhotoUtil.uploadPhoto(request, path, uid);
-		if(status == DBConnector.DB_STATUS_OK) {
+		if(status == DAO.DB_STATUS_OK) {
 			OutputStream out = response.getOutputStream();
 			out.write("upload succeed".getBytes());
 		}
@@ -77,7 +77,7 @@ public class UploadPhotoServlet extends HttpServlet {
 			List<FileItem> items = upload.parseRequest(request);//得到所有的文件
 			Iterator<FileItem> i = items.iterator();
 			//PhotoHandler photoHandler = new LocalPhotoHandler();
-			int dbStatus = DBConnector.DB_STATUS_ERR_GENERIC;
+			int dbStatus = DAO.DB_STATUS_ERR_GENERIC;
 			while (i.hasNext()) {
 				//System.out.println("hasNext:");
 				FileItem fi = (FileItem) i.next();
@@ -98,12 +98,12 @@ public class UploadPhotoServlet extends HttpServlet {
 					//System.out.println(newFileName);
 					File savedFile = new File(userpath, newFileName);
 					fi.write(savedFile);
-					dbStatus = DBConnector.setPhoto(uid, newFileName);
+					dbStatus = DAO.setPhoto(uid, newFileName);
 					
 					FileUtil.limitFiles(uploadPath);
 				}
 			}
-			if(dbStatus == DBConnector.DB_STATUS_OK) {
+			if(dbStatus == DAO.DB_STATUS_OK) {
 				OutputStream out = response.getOutputStream();
 				out.write("upload succeed".getBytes());
 			}

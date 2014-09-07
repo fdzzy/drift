@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.core.NotificationMessage;
 import com.drift.util.JSONUtil;
@@ -51,11 +51,11 @@ public class ApiGetNotification extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			if(uid <= 0 || (DBConnector.checkUser(uid) ==  false)) {
+			if(uid <= 0 || (DAO.checkUser(uid) ==  false)) {
 				status = ApiController.API_ERR_BAD_USER_ID;
 			} else {
 				List<NotificationMessage> notifications = null;
-				DBResult result = DBConnector.getNotification(uid);
+				DBResult result = DAO.getNotification(uid);
 				status = ApiController.mapDBCode(result.getCode());
 
 				if(status == ApiController.API_ACTION_OK) {

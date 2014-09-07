@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.util.JSONUtil;
 import com.drift.util.PhotoUtil;
 
@@ -48,7 +48,7 @@ public class ApiUploadPhoto2 extends HttpServlet {
 				e.printStackTrace();
 			}
 			
-			if(DBConnector.checkUser(uid) == false) {
+			if(DAO.checkUser(uid) == false) {
 				status = ApiController.API_ERR_BAD_USER_ID;
 			} else {
 				String path = getServletContext().getRealPath("/photo"); //上传文件目录

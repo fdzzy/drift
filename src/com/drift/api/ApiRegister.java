@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.util.JSONUtil;
 
 /**
@@ -36,7 +36,7 @@ public class ApiRegister extends HttpServlet {
 		
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		String sex = request.getParameter("sex");
+		String sexStr = request.getParameter("sex");
 		String nickname = request.getParameter("nickname");
 		String birthday = request.getParameter("birthday");
 		String school = request.getParameter("school");
@@ -48,7 +48,14 @@ public class ApiRegister extends HttpServlet {
 		if(birthday == null || birthday.isEmpty())
 			birthday = "1990-01-01";
 
-		int result = DBConnector.register(username, nickname, password, sex, birthday, 
+		int sex = -1;
+		try {
+			sex = Integer.parseInt(sexStr);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		int result = DAO.register(username, nickname, password, sex, birthday, 
 				school, department, major, enrollYear, email);
 		int status = ApiController.mapDBCode(result);
 		String msg = ApiController.API_CODE_STRINGS.get(status);

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 
 import com.drift.core.ChatMessage;
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.core.User;
 
@@ -63,19 +63,19 @@ public class SendReceiveMessage extends HttpServlet {
 		User friend = null;
 		if(action == null) {
 			List<ChatMessage> messages = null;
-			DBResult result = DBConnector.getConversation(user.getUid(), friendId);
-			if(result.getCode() == DBConnector.DB_STATUS_OK) {
+			DBResult result = DAO.getConversation(user.getUid(), friendId);
+			if(result.getCode() == DAO.DB_STATUS_OK) {
 				messages = (List<ChatMessage>) result.getResultObject();
 			}
-			friend = DBConnector.getUser(friendId);
+			friend = DAO.getUser(friendId);
 			
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);
 			getServletContext().getRequestDispatcher("/chat.jsp").forward(request, response);
 		} else if(action.equals("receive")) {
 			List<ChatMessage> messages = null;
-			DBResult result = DBConnector.getNewMessagesFromFriend(user.getUid(), friendId);
-			if(result.getCode() == DBConnector.DB_STATUS_OK) {
+			DBResult result = DAO.getNewMessagesFromFriend(user.getUid(), friendId);
+			if(result.getCode() == DAO.DB_STATUS_OK) {
 				messages = (List<ChatMessage>) result.getResultObject();
 			}
 			
@@ -88,11 +88,11 @@ public class SendReceiveMessage extends HttpServlet {
 			String content = (String) request.getParameter("content");
 			List<ChatMessage> messages = null;
 			int uid = user.getUid();
-			friend = DBConnector.getUser(friendId);
-			int rtval = DBConnector.sendMessage(uid, friendId, content);
-			if(rtval == DBConnector.DB_STATUS_OK) {
-				DBResult result = DBConnector.getNewMessagesFromFriend(uid, friendId);
-				if(result.getCode() == DBConnector.DB_STATUS_OK) {
+			friend = DAO.getUser(friendId);
+			int rtval = DAO.sendMessage(uid, friendId, content);
+			if(rtval == DAO.DB_STATUS_OK) {
+				DBResult result = DAO.getNewMessagesFromFriend(uid, friendId);
+				if(result.getCode() == DAO.DB_STATUS_OK) {
 					messages = (List<ChatMessage>) result.getResultObject();
 				}
 				messages.add(new ChatMessage(0, uid, user.getUsername(), friendId, friend.getUsername(),

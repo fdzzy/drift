@@ -4,7 +4,7 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -36,7 +36,7 @@
 		return;
 	}
 
-	List<ChatMessage> messages = DBConnector.getMyBottles(uid, 0, 30);
+	List<ChatMessage> messages = DAO.getMyBottles(uid, 0, 30);
 
 	if (messages == null || messages.isEmpty()) {
 		status = ERR_NO_BOTTLES;

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.util.JSONUtil;
 
 /**
@@ -50,12 +50,12 @@ public class ApiSendMessage extends HttpServlet {
 				e.printStackTrace();
 			}
 			
-			if(uid <= 0 || (DBConnector.checkUser(uid) ==  false)) {
+			if(uid <= 0 || (DAO.checkUser(uid) ==  false)) {
 				status = ApiController.API_ERR_BAD_USER_ID;
-			} else if(friendId <= 0 || (DBConnector.checkUser(friendId) == false)) {
+			} else if(friendId <= 0 || (DAO.checkUser(friendId) == false)) {
 				status = ApiController.API_ERR_BAD_FRIEND_ID;
 			} else {
-				int rtval = DBConnector.sendMessage(uid, friendId, content);
+				int rtval = DAO.sendMessage(uid, friendId, content);
 				status = ApiController.mapDBCode(rtval);
 			}
 		}

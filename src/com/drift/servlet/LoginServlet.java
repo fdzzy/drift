@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 
 
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.core.User;
 
@@ -50,29 +50,29 @@ public class LoginServlet extends HttpServlet {
 		String password = request.getParameter("password");
 		DBResult result = null;
 		
-		result = DBConnector.login(username, password);
+		result = DAO.login(username, password);
 		
 		switch (result.getCode()) {
-		case DBConnector.DB_STATUS_OK:
+		case DAO.DB_STATUS_OK:
 			// login success
 			User user = (User) result.getResultObject();
 			HttpSession session = request.getSession();
 			session.setAttribute(MyServletUtil.SESS_USER, user);
 			page = MyServletUtil.mainJspPage;
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_NOT_EXIST:
+		case DAO.DB_STATUS_ERR_USER_NOT_EXIST:
 			request.setAttribute("msg","用户名不存在！");
 			break;
-		case DBConnector.DB_STATUS_ERR_EMAIL_NOT_EXIST:
+		case DAO.DB_STATUS_ERR_EMAIL_NOT_EXIST:
 			request.setAttribute("msg","邮箱不存在！");
 			break;
-		case DBConnector.DB_STATUS_ERR_PASSWORD:
+		case DAO.DB_STATUS_ERR_PASSWORD:
 			request.setAttribute("msg","密码错误！");
 			break;
-		case DBConnector.DB_STATUS_ERR_USER_NOT_ACTIVATED:
+		case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
 			request.setAttribute("msg","用户未激活！");
 			break;
-		case DBConnector.DB_STATUS_ERR_SQL:
+		case DAO.DB_STATUS_ERR_SQL:
 			System.err.println("数据库错误！");
 		default:
 			request.setAttribute("msg","未知错误！");

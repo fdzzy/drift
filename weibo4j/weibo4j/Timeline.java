@@ -203,6 +203,21 @@ public class Timeline extends Weibo{
 			new PostParameter("screen_name", screen_name)
 		}));
 	}
+	/*
+	 * Added by Joey
+	 */
+	public StatusWapper getUserTimelineByCount(int count) throws WeiboException {
+		if(count < 0) {
+			count = 20;
+		}else if (count > 100) {
+			// max count is 100
+			count = 100;
+		}
+		return Status.constructWapperStatus(client.get(WeiboConfig
+				.getValue("baseURL") + "statuses/user_timeline.json",new PostParameter[]{
+			new PostParameter("count", count)
+		}));
+	}
 	/**
 	 * 获取某个用户最新发表的微博列表
 	 * 

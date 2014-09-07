@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.User;
 
 /**
@@ -44,7 +44,7 @@ public class EditProfileServlet extends HttpServlet {
 			}
 		}
 		
-		String photoUrl = DBConnector.getPhotoUrl(uid);
+		String photoUrl = DAO.getPhotoUrl(uid);
 		request.setAttribute("photoUrl",photoUrl);
 		getServletContext().getRequestDispatcher("/edit_profile.jsp").forward(request, response);
 	}
@@ -66,9 +66,9 @@ public class EditProfileServlet extends HttpServlet {
 			return;
 		}
 		
-		int rtval = DBConnector.DB_STATUS_ERR_GENERIC;
-		rtval = DBConnector.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
-		if(rtval == DBConnector.DB_STATUS_OK) {
+		int rtval = DAO.DB_STATUS_ERR_GENERIC;
+		rtval = DAO.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
+		if(rtval == DAO.DB_STATUS_OK) {
 			String msg = "<center><p><font color='green'>修改成功！</font></p></center>";
 			request.setAttribute("msg",msg);
 		} else {

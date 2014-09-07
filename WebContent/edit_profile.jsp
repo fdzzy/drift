@@ -22,9 +22,6 @@ function openwin() {
 function openwin2() {
 	window.open("edit_photo2.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
 }
-function openwin3() {
-	window.open("edit_photo3.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
-}
 -->
 </script>
 
@@ -42,7 +39,7 @@ if(user == null) {
 }
 
 // the profile may have changed
-user = DBConnector.getUser(user.getUid());
+user = DAO.getUser(user.getUid());
 session.setAttribute(MyServletUtil.SESS_USER, user);
 
 String msg =(String)request.getAttribute("msg");
@@ -73,8 +70,6 @@ style="cursor:pointer" alt="修改头像" title="修改头像"/>
 <a href='#' onclick='openwin()'>修改头像_form_data</a>
 <br/>
 <a href='#' onclick='openwin2()'>修改头像_octet_stream</a>
-<br/>
-<a href='#' onclick='openwin3()'>修改头像_form_data_base64</a>
 </center>
 </p>
 </td>

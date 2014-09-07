@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.drift.core.ChatMessage;
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.core.DBResult;
 import com.drift.util.JSONUtil;
 
@@ -53,13 +53,13 @@ public class ApiGetUnread extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			if(uid <= 0 || (DBConnector.checkUser(uid) ==  false)) {
+			if(uid <= 0 || (DAO.checkUser(uid) ==  false)) {
 				status = ApiController.API_ERR_BAD_USER_ID;
-			} else if(friendId <= 0 || (DBConnector.checkUser(friendId) == false)) {
+			} else if(friendId <= 0 || (DAO.checkUser(friendId) == false)) {
 				status = ApiController.API_ERR_BAD_FRIEND_ID;
 			} else {
 				List<ChatMessage> messages = null;
-				DBResult result = DBConnector.getNewMessagesFromFriend(uid, friendId);
+				DBResult result = DAO.getNewMessagesFromFriend(uid, friendId);
 				status = ApiController.mapDBCode(result.getCode());
 
 				if(status == ApiController.API_ACTION_OK) {

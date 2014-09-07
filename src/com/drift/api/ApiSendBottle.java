@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.util.JSONUtil;
 
 /**
@@ -50,7 +50,7 @@ public class ApiSendBottle extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			int	rtval = DBConnector.postBottle(uid, content);
+			int	rtval = DAO.postBottle(uid, content);
 			status = ApiController.mapDBCode(rtval);
 		}
 		String msg = ApiController.API_CODE_STRINGS.get(status);

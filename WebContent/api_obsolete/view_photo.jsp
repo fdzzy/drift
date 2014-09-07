@@ -1,7 +1,7 @@
 <%@page import="com.drift.util.JSONUtil"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -29,7 +29,7 @@
 		return;
 	}
 	
-	String photoUrl = DBConnector.getPhotoUrl(uid);
+	String photoUrl = DAO.getPhotoUrl(uid);
 	
 	if(photoUrl == null) {
 		status = ERR_NO_SUCH_USER;

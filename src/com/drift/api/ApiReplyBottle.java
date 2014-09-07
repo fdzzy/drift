@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DBConnector;
+import com.drift.core.DAO;
 import com.drift.util.JSONUtil;
 
 /**
@@ -53,7 +53,7 @@ public class ApiReplyBottle extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			int	senderID = DBConnector.replyBottle(uid, bid);
+			int	senderID = DAO.replyBottle(uid, bid);
 			if(senderID > 0) {
 				status = ApiController.API_ACTION_OK;
 					map.put("senderId", senderID);

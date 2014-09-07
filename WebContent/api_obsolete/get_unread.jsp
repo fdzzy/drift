@@ -4,7 +4,7 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
-<%@page import="com.drift.core.DBConnector"%>
+<%@page import="com.drift.core.DAO"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@ page contentType="application/json; charset=utf8" %>
 
@@ -28,7 +28,7 @@
 	Map<String, Object> map = new HashMap<String, Object>();
 	
 	List<ChatMessage> messages = null;
-	messages = DBConnector.getNewMessagesFromFriend(uid, friendId);
+	messages = DAO.getNewMessagesFromFriend(uid, friendId);
 	
 	if(messages == null || messages.isEmpty()) {
 		status = ERR_NO_MESSAGES;

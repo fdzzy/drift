@@ -15,7 +15,7 @@ public class DBResult {
 	}
 
 	public DBResult() {
-		this.code = DBConnector.DB_STATUS_ERR_GENERIC;
+		this.code = DAO.DB_STATUS_ERR_GENERIC;
 		this.result = null;
 	}	
 	

@@ -2,6 +2,9 @@
     <wb-module deploy-name="drift">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/nlpcn"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/bae"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/weibo4j"/>
         <property name="context-root" value="drift"/>
         <property name="java-output-path" value="/drift/build/classes"/>
     </wb-module>

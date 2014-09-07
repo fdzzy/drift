@@ -27,8 +27,7 @@ if(user == null || bottle == null) {
 	return;
 }
 int senderUid = bottle.getSenderId();
-String photoUrl = DBConnector.getPhotoUrl(senderUid);
-
+String photoUrl = DAO.getPhotoUrl(senderUid);
 %>
 
 <form action="do_post.jsp" method="post" onsubmit='return checkinfo(this)'>

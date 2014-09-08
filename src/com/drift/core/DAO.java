@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 //import java.util.Properties;
 
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.sql.DataSource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -35,6 +39,7 @@ public class DAO {
 	public static final int DB_STATUS_ERR_USER_ID = -10;
 	public static final int DB_STATUS_ERR_BOTTLE_ID = -11;
 	public static final int DB_STATUS_ERR_NO_BOTTLE = -12;
+	public static final int DB_STATUS_ERR_EMAIL_REJECTED = -13;
 	
 	public static final int USER_TYPE_THIS_SITE = 0;
 	public static final int USER_TYPE_SINA = 1;
@@ -135,6 +140,10 @@ public class DAO {
 		
 		if(email== null || email.isEmpty()) {
 			return DB_STATUS_ERR_BAD_ARGS;
+		}
+		
+		if(!allowEmail(email)) {
+			return DB_STATUS_ERR_EMAIL_REJECTED;
 		}
 
 		try {
@@ -289,21 +298,8 @@ public class DAO {
 					int uid = selectRs3.getInt(1);
 					java.sql.Timestamp timestamp2 = selectRs3.getTimestamp(2);
 					long ts = timestamp2.getTime();
-					String activationCode = getActivationCode(username, password, sex, email, uid, ts);
-
-					String subject = username + "，欢迎注册漂流瓶应用";
-					StringBuffer content = new StringBuffer();
-					content.append("尊敬的用户" + username + ":<br/><br/>");
-					content.append("您好！欢迎注册漂流瓶应用！<br/><br/>");
-					content.append("请点击以下链接激活账号，链接仅使用一次，请尽快激活！<br/>");    		  
-					String link = MyServletUtil.entryURL + "/register?action=activate&email="
-							+ email + "&activateCode=" + activationCode;
-					content.append("<a href=\"" + link + "\">");
-					content.append(link);
-					content.append("</a>");
-					content.append("<br/><br/>漂流瓶工作组");
-					SendEmail.send(email, subject, content.toString());    		  
-
+					sendActivationEmail(username, sex, email, uid, ts);
+					
 					//System.out.println("DB timestamp is " + timestamp2.getTime());
 					result = DB_STATUS_OK;
 				} else {
@@ -326,6 +322,24 @@ public class DAO {
 		}
 
 		return result;
+	}
+
+	private static void sendActivationEmail(String username, int sex,
+			String email, int uid, long ts) {
+		String activationCode = getActivationCode(username, sex, email, uid, ts);
+
+		String subject = username + "，欢迎注册寻寻觅觅";
+		StringBuffer content = new StringBuffer();
+		content.append("尊敬的用户" + username + ":<br/><br/>");
+		content.append("您好！欢迎注册寻寻觅觅！<br/><br/>");
+		content.append("请点击以下链接激活账号，链接仅使用一次，请尽快激活！<br/>");    		  
+		String link = MyServletUtil.entryURL + "/register?action=activate&email="
+				+ email + "&activateCode=" + activationCode;
+		content.append("<a href=\"" + link + "\">");
+		content.append(link);
+		content.append("</a>");
+		content.append("<br/><br/>寻寻觅觅工作组");
+		SendEmail.send(email, subject, content.toString());
 	}
 
 	/* Register a Foreign site user into the DB
@@ -365,6 +379,11 @@ public class DAO {
 			result.setCode(DB_STATUS_ERR_BAD_ARGS);
 			return result;
 		}
+		
+		if(!allowEmail(email)) {
+			result.setCode(DB_STATUS_ERR_EMAIL_REJECTED);
+			return result;
+		}
 
 		if(enrollYear == null || enrollYear.isEmpty())
 			enrollYear = 0 + "";
@@ -391,9 +410,9 @@ public class DAO {
 					result.setCode(DB_STATUS_ERR_EMAIL_EXISTS);
 				} else {
 					String insertStatement = "insert into users (NAME, NICKNAME, SEX, BIRTHDAY, " + 
-							"SCHOOL, DEPARTMENT, MAJOR, ENROLLYEAR, EMAIL, REGISTER_TIME, ACTIVATED, " + 
+							"SCHOOL, DEPARTMENT, MAJOR, ENROLLYEAR, EMAIL, REGISTER_TIME, " + 
 							"TYPE, F_UID) values " + 
-							"(?,?,?,?,?,?,?,?,?,NOW(),1,?,?)";
+							"(?,?,?,?,?,?,?,?,?,NOW(),?,?)";
 					//System.out.println("Register: INSERT SQL String: " + insertStatement);
 					insertPrepStmt = con.prepareStatement(insertStatement);
 					insertPrepStmt.setString(1, username);
@@ -409,7 +428,7 @@ public class DAO {
 					insertPrepStmt.setString(11, f_uid);
 
 					if(insertPrepStmt.executeUpdate() != 0) {
-						selectStatement = "select ID from users where TYPE=? and F_UID=?";
+						selectStatement = "select ID, REGISTER_TIME from users where TYPE=? and F_UID=?";
 						selectPrepStmt3 = con.prepareStatement(selectStatement);
 						selectPrepStmt3.setInt(1, type);
 						selectPrepStmt3.setString(2, f_uid);
@@ -417,6 +436,10 @@ public class DAO {
 
 						if(selectRs3.next()) {
 							int uid = selectRs3.getInt(1);
+							java.sql.Timestamp timestamp = selectRs3.getTimestamp(2);
+							long ts = timestamp.getTime();
+					        sendActivationEmail(username, sex, email, uid, ts);
+					        
 							User user = getUser(uid);
 							result.setResultObject(user);
 							result.setCode(DB_STATUS_OK);
@@ -444,14 +467,24 @@ public class DAO {
 		return result;
 	}
 
-	static public String getActivationCode(String username, String password, int sex,
-			String email, int uid, long ts) {
+	/**
+	 * Allow only *@*.edu.cn for now
+	 * @param email
+	 * @return
+	 */
+	private static boolean allowEmail(String email) {		
+		String patternStr = "@\\w+\\.edu\\.cn";
+		Pattern pattern = Pattern.compile(patternStr);
+		Matcher matcher = pattern.matcher(email);
+		return matcher.find();
+	}
+
+	static private String getActivationCode(String username, int sex, String email, int uid, long ts) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(uid);
 		sb.append(email);
 		sb.append(username);
 		sb.append(Gender.makeGender(sex).toString());
-		sb.append(password);
 		sb.append(ts);
 		return MD5Util.encode2hex(sb.toString());
 	}
@@ -465,7 +498,7 @@ public class DAO {
 		
 		try {
 			con = getConnection();
-			String selectStatement = "select ID, NAME, PASSWORD, SEX, REGISTER_TIME from users where EMAIL=? and TYPE=0";
+			String selectStatement = "select ID, NAME, SEX, REGISTER_TIME from users where EMAIL=?";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setString(1, email);
 			rs = prepStmt.executeQuery();
@@ -476,11 +509,11 @@ public class DAO {
 			} else {
 				int uid = rs.getInt(1);
 				String username = rs.getString(2);
-				String password = rs.getString(3);
-				int sex = rs.getInt(4);
-				java.sql.Timestamp timestamp = rs.getTimestamp(5);
+				int sex = rs.getInt(3);
+				java.sql.Timestamp timestamp = rs.getTimestamp(4);
 				
-				String activateCode = getActivationCode(username, password, sex, email, uid, timestamp.getTime());
+				String activateCode = getActivationCode(username, sex, email, uid, timestamp.getTime());
+				//System.out.println(activateCode);
 
 				if(codeInput.equals(activateCode)) {
 					// Update this ACTIVATED code in Database
@@ -789,7 +822,7 @@ public class DAO {
 
 		try {
 			con=getConnection();
-			String selectStatement = "select ID from users where TYPE=? and F_UID=?";
+			String selectStatement = "select ID, ACTIVATED, REGISTER_TIME from users where TYPE=? and F_UID=?";
 			prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setInt(1, type);
 			prepStmt.setString(2, f_uid);
@@ -800,6 +833,20 @@ public class DAO {
 				result.setCode(DB_STATUS_ERR_USER_NOT_EXIST);
 			} else {
 				int uid = rs.getInt(1);
+				int activated = rs.getInt(2);
+				if(activated==0) {
+					Timestamp ts = rs.getTimestamp(3);
+					long registerTs = ts.getTime() / 1000;
+					long now = System.currentTimeMillis() / 1000;
+					/* Give the user some time to try out before activation is required 
+					 */
+					if((now - registerTs) > 24 * 3600) {
+						System.err.println("now: " + now +", register: " + registerTs);
+						System.err.println("uid " + uid + " not activated!");
+						result.setCode(DB_STATUS_ERR_USER_NOT_ACTIVATED);
+						return result;
+					}
+				}
 				user = getUser(uid);
 				if(user == null) {
 					result.setCode(DB_STATUS_ERR_SQL);

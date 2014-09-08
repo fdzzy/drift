@@ -43,9 +43,13 @@ public class CheckEmailServlet extends HttpServlet {
 		result = DAO.checkEmail(email);
 		
 		if(result == DAO.DB_STATUS_OK) {
-			out.print("true");
+			out.print("ok");
+		} else if(result == DAO.DB_STATUS_ERR_EMAIL_EXISTS){
+			out.print("exist");
+		} else if(result == DAO.DB_STATUS_ERR_EMAIL_REJECTED) {
+			out.print("reject");
 		} else {
-			out.print("false");
+			out.print("error");
 		}
 	}
 

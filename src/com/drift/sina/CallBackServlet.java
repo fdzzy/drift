@@ -121,6 +121,10 @@ public class CallBackServlet extends HttpServlet {
 				request.setAttribute("imgUrl", weiboUser.getAvatarLarge());
 				getServletContext().getRequestDispatcher("/third_party_register.jsp").forward(request, response);
 				break;
+			case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
+				request.setAttribute("msg", "24小时试用期已过，请去邮箱激活");
+				getServletContext().getRequestDispatcher(MyServletUtil.loginJspPage).forward(request, response);
+				break;
 			case DAO.DB_STATUS_OK:
 				com.drift.core.User user = (com.drift.core.User) result.getResultObject();
 				session.setAttribute(MyServletUtil.SESS_USER, user);
@@ -129,7 +133,7 @@ public class CallBackServlet extends HttpServlet {
 					System.err.println("Update access token failed!");
 				}*/
 				//getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
-				response.sendRedirect(getServletContext().getContextPath() + "/main.jsp");
+				response.sendRedirect(getServletContext().getContextPath() + MyServletUtil.mainJspPage);
 			default:
 				break;
 			}

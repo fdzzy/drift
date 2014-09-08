@@ -84,6 +84,8 @@ public class RegisterServlet extends HttpServlet {
 			PhotoUtil.downloadForeignPhoto(imgUrl, path, user);
 			
 			page = MyServletUtil.mainJspPage;
+		} else if(result.getCode() == DAO.DB_STATUS_ERR_EMAIL_REJECTED) {
+			request.setAttribute("msg", "仅支持*.edu.cn邮箱");
 		} else {
 			request.setAttribute("msg", "第三方注册错误");
 		}

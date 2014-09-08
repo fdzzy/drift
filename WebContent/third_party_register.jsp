@@ -32,12 +32,15 @@ function checkEmail(email) {
 			if(xmlHttp.readyState == 4) {
 				if(xmlHttp.status == 200) {
 					var text = xmlHttp.responseText;
-					if(text == "true") {
+					if(text == "ok") {
 						emailOK = true;
 						document.getElementById("msg").innerHTML = "<font color='green'>可使用此邮箱！</font>";
+					} else if(text == "exist"){
+						emailOK = false;
+						document.getElementById("msg").innerHTML = "<font color='red'>此邮箱已被占用！</font>";
 					} else {
 						emailOK = false;
-						document.getElementById("msg").innerHTML = "<font color='red'>此邮箱已注册本站！</font>";
+						document.getElementById("msg").innerHTML = "<font color='red'>此邮箱不用！</font>";
 					}
 				}
 			}
@@ -59,7 +62,7 @@ function checkinfo(f) {
 		f.email.focus();
 		return false;
 	} else if(emailOK == false) {
-	    alert('邮箱已注册本站！');
+	    alert('邮箱不可用！');
 		f.email.focus();
 		return false;
 	} else if(checkDate(f.birthday.value) == false) {
@@ -148,9 +151,13 @@ String imgUrl = (String)request.getAttribute("imgUrl");
 </tr>
 <tr>
   <td>邮箱：</td>
-  <td><input type="email" name="email" size="25" onblur="checkEmail(this.value)"></td>
-  <td>*</td>
+  <td><input type="email" name="email" size="25" onblur="checkEmail(this.value)">*</td>
 </tr><tr>
+  <td></td>
+  <td>我们会发送激活邮件到您的邮箱，<br/>在未激活前，您可以试用24小时。<br/><br/>
+  目前仅接受*.edu.cn为后缀的邮箱</td>
+</tr>
+<tr>
   <td></td>
   <td id="msg"></td>
 </tr>

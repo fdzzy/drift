@@ -17,13 +17,25 @@ import com.drift.core.DAO;
 import com.drift.core.User;
 
 public final class MyServletUtil {
-	public static final String loginJspPage = "/login.jsp";
-	public static final String registerJspPage = "/register.jsp";
-	public static final String registerOkJspPage = "/register_ok.jsp";
-	public static final String mainJspPage = "/main.jsp";
-	public static final String activateJspPage = "/activate_tip.jsp";
-	public static final String getBottleJspPage = "/get_bottle.jsp";
-	public static final String doPostBottleJspPage = "/do_post.jsp";
+	private static final String pattToJsp = "/WEB-INF/pages";
+	
+	public static final String loginJspPage = pattToJsp + "/login.jsp";
+	public static final String registerJspPage = pattToJsp + "/register.jsp";
+	public static final String registerOkJspPage = pattToJsp + "/register_ok.jsp";
+	public static final String mainJspPage = pattToJsp + "/main.jsp";
+	public static final String activateJspPage = pattToJsp + "/activate_tip.jsp";
+	public static final String getBottleJspPage = pattToJsp + "/get_bottle.jsp";
+	public static final String doPostBottleJspPage = pattToJsp + "/do_post.jsp";
+	public static final String postBottleJspPage = pattToJsp + "/post_bottle.jsp";
+	public static final String messagesJspPage = pattToJsp + "/messages.jsp";
+	public static final String logoutJspPage = pattToJsp + "/logout.jsp";
+	public static final String editProfileJspPage = pattToJsp + "/edit_profile.jsp";
+	public static final String editPhotoJspPage = pattToJsp + "/edit_photo.jsp";
+	public static final String showUserJspPage = pattToJsp + "/user.jsp";
+	public static final String errorJspPage = pattToJsp + "/errorpage.jsp";
+	public static final String chatJspPage = pattToJsp + "/chat.jsp";
+	public static final String testEmailJspPage = pattToJsp + "/test_email.jsp";
+	public static final String thirdPartyRegisterJspPage = pattToJsp + "/third_party_register.jsp";
 	
 	private static final String MY_SERVLET_UTIL_PROPS_PATH = "MyServletUtil.properties";
 	public static String entryURL = null;

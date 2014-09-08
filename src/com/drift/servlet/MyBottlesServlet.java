@@ -51,7 +51,7 @@ public class MyBottlesServlet extends HttpServlet {
 		if(messages != null && !messages.isEmpty()) {
 			request.setAttribute("messages", messages);
 			//System.out.println(friends);
-			getServletContext().getRequestDispatcher("/messages.jsp").forward(request, response);
+			getServletContext().getRequestDispatcher(MyServletUtil.messagesJspPage).forward(request, response);
 		} else {
 			PrintWriter out = response.getWriter();
 			out.println("<html><head>");

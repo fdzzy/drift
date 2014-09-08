@@ -21,7 +21,7 @@ response.setHeader("refresh","2,URL=login");
 
 <center>
 <h3>再见，<%=user.getUsername()%>!</h3><br>
-<strong><a href="login.jsp">2秒后将自动跳转登录页面，如未跳转请点击</a></strong>
+<strong><a href="login">2秒后将自动跳转登录页面，如未跳转请点击</a></strong>
 </center>
 
 </body></html>

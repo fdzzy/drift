@@ -46,7 +46,7 @@ public class EditProfileServlet extends HttpServlet {
 		
 		String photoUrl = DAO.getPhotoUrl(uid);
 		request.setAttribute("photoUrl",photoUrl);
-		getServletContext().getRequestDispatcher("/edit_profile.jsp").forward(request, response);
+		getServletContext().getRequestDispatcher(MyServletUtil.editProfileJspPage).forward(request, response);
 	}
 
 	private void doEdit(HttpServletRequest request, HttpServletResponse response, int uid) {

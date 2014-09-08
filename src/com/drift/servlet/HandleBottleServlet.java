@@ -75,7 +75,7 @@ public class HandleBottleServlet extends HttpServlet {
 			friend = DAO.getUser(senderID);
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);
-			getServletContext().getRequestDispatcher("/chat.jsp").forward(request, response);
+			getServletContext().getRequestDispatcher(MyServletUtil.chatJspPage).forward(request, response);
 			//getServletContext().getRequestDispatcher("/send_receive?friend=" + senderID).forward(request, response);
 		}
 	}
@@ -86,7 +86,7 @@ public class HandleBottleServlet extends HttpServlet {
 		int result = DAO.DB_STATUS_ERR_GENERIC;
 		result = DAO.setBottleUnread(bottleId);
 		if(result == DAO.DB_STATUS_OK) {
-			getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
+			getServletContext().getRequestDispatcher(MyServletUtil.mainJspPage).forward(request, response);
 		}
 	}
 

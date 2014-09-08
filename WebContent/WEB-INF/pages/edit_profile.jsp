@@ -17,7 +17,7 @@
 <script type="text/javascript">
 <!--
 function openwin() {
-	window.open("edit_photo.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
+	window.open("edit_photo","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
 }
 function openwin2() {
 	window.open("edit_photo2.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
@@ -33,7 +33,7 @@ function openwin2() {
 if(user == null) {
 	out.println("请稍后重试！");
 %>
-  <a href="main.jsp">返回</a>
+  <a href="main">返回</a>
 <%
 	return;
 }
@@ -67,9 +67,11 @@ style="cursor:pointer" alt="修改头像" title="修改头像"/>
 </p>
 <p>
 <center>
-<a href='#' onclick='openwin()'>修改头像_form_data</a>
+<a href='#' onclick='openwin()'>修改头像</a>
+<!-- 
 <br/>
 <a href='#' onclick='openwin2()'>修改头像_octet_stream</a>
+ -->
 </center>
 </p>
 </td>
@@ -127,7 +129,7 @@ style="cursor:pointer" alt="修改头像" title="修改头像"/>
 
 <center>
 <p>
-<a href='main.jsp'>返回</a>
+<a href='main'>返回</a>
 </p>
 </center>
 </body>

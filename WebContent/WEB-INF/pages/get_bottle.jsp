@@ -4,7 +4,6 @@
 <%@ page errorPage="errorpage.jsp" %>
 <%@ include file="common.jsp" %>
 <%@ include file="check_login.jsp" %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />

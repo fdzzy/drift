@@ -14,7 +14,7 @@ import com.drift.core.User;
 /**
  * Servlet implementation class PostBottleServlet
  */
-@WebServlet("/do_post")
+@WebServlet("/post_bottle")
 public class PostBottleServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -36,24 +36,29 @@ public class PostBottleServlet extends HttpServlet {
 			return;
 		}
 		
-		String content = request.getParameter("content");
-		System.out.println("\"" + user.getUsername() + "\"" + "发送了消息：\"" + content + "\"");
-		
-		int rtval = 0;
-		rtval = DAO.postBottle(user.getUid(), content);
-		
-		String msg;
-		switch (rtval) {
-		case DAO.DB_STATUS_OK:
-			msg = "<font color='green'>发送成功！</font>";
-			break;
-		default:
-			msg = "<font color='red'>发送失败，请重试！</font>";
-			break;
-		}
-		//System.out.println(msg);
-		request.setAttribute("msg", msg);
-		getServletContext().getRequestDispatcher(MyServletUtil.doPostBottleJspPage).forward(request, response);
+		String page = MyServletUtil.postBottleJspPage;
+		String action = request.getParameter("action");
+		if(action != null && action.equals("do_post")) {
+			String content = request.getParameter("content");
+			System.out.println("\"" + user.getUsername() + "\"" + "发送了消息：\"" + content + "\"");
+			
+			int rtval = 0;
+			rtval = DAO.postBottle(user.getUid(), content);
+			
+			String msg;
+			switch (rtval) {
+			case DAO.DB_STATUS_OK:
+				msg = "<font color='green'>发送成功！</font>";
+				break;
+			default:
+				msg = "<font color='red'>发送失败，请重试！</font>";
+				break;
+			}
+			//System.out.println(msg);
+			request.setAttribute("msg", msg);
+			page = MyServletUtil.doPostBottleJspPage;
+		}		
+		getServletContext().getRequestDispatcher(page).forward(request, response);
 
 	}
 

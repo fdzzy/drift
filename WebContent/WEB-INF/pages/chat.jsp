@@ -110,7 +110,7 @@ function checkMessage() {
 				if(xmlHttp.status == 200) {
 					var text = xmlHttp.responseText;
 					if(text == "false") {
-						window.window.location.href = 'login.jsp';
+						window.window.location.href = 'login';
 					}
 					var res = eval("(" + text +")");
 					var newMessageFlag = 0;
@@ -194,7 +194,7 @@ List<ChatMessage> messages = (List<ChatMessage>)request.getAttribute("messages")
 if(messages == null || friend == null) {
 	out.println("请稍后重试！");
 %>
-  <a href="main.jsp">返回</a>
+  <a href="main">返回</a>
 <%
 	return;
 }
@@ -203,7 +203,7 @@ String friendPhotoUrl = DAO.getPhotoUrl(friend.getUid());
 String myPhotoUrl = DAO.getPhotoUrl(user.getUid());
 %>
 
-<a href="user.jsp?id=<%=friend.getUid()%>">
+<a href="show_user?id=<%=friend.getUid()%>">
 <center><%=friend.getUsername()%>
   <img src="<%=friendPhotoUrl%>" height="30" width="30"/></center></a>
 

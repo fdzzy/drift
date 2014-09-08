@@ -27,7 +27,7 @@ photoUrl = DAO.getPhotoUrl(id);
 if(targetUser == null) {
 	out.println("请稍后重试！");
 %>
-  <a href="main.jsp">返回</a>
+  <a href="main">返回</a>
 <%
 	return;
 }

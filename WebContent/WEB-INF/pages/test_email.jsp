@@ -49,7 +49,7 @@ if(msg!=null && !msg.isEmpty()) {
 <center><br/>
   <input type="submit" value="发送">
   <input type="reset" name="Reset" value="清空"><br/><br/>
-  <a href="login.jsp">返回</a>
+  <a href="login">返回</a>
 </center>
 
 </form>

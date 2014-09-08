@@ -26,7 +26,7 @@ function checkinfo(f) {
 <font size=+3><b><%=user.getUsername()%>，欢迎使用漂流瓶应用</b></font>
 </center></p><hr/>
 
-<form action="do_post" method="post" onsubmit='return checkinfo(this)'>
+<form action="post_bottle?action=do_post" method="post" onsubmit='return checkinfo(this)'>
 <center>
 <table>
 <tr>
@@ -38,7 +38,7 @@ function checkinfo(f) {
 <center><br/>
   <input type="submit" value="提交">
   <input type="reset" name="Reset" value="清空"><br/><br/>
-  <a href="main.jsp">返回</a>
+  <a href="main">返回</a>
 </center>
 </form>
 

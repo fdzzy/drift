@@ -19,7 +19,7 @@
 恭喜您<%=request.getAttribute("username")%>，您已注册成功！<br/>
 已发送激活邮件至<%=request.getAttribute("email") %>，请尽快登录邮箱激活！
 </p>
-<p><a href="login.jsp">返回</a></p>
+<p><a href="login">返回</a></p>
 </center>
 
 </body></html>

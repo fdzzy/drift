@@ -9,7 +9,7 @@
   </font>
 </p>
 <p>
-  <a href='main.jsp'>back</a>
+  <a href='main'>back</a>
 </p>
 
 </body></html>

@@ -34,12 +34,20 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		MyServletUtil.setCharacterEncoding(request, response);	
-		String action = request.getParameter("action");
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute(MyServletUtil.SESS_USER);
+		
 		String page = MyServletUtil.loginJspPage;
-		if(action != null) {
-			if(action.equals("login")) {
-				page = doLogin(request);				
+		if(user == null || user.getUid() <= 0) {
+			String action = request.getParameter("action");
+			if(action != null) {
+				if(action.equals("login")) {
+					page = doLogin(request);				
+				}
 			}
+		} else {
+			page = MyServletUtil.mainJspPage;
 		}
 		getServletContext().getRequestDispatcher(page).forward(request, response);
 	}

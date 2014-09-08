@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="Refresh" content="10;main.jsp">
+<meta http-equiv="Refresh" content="10;main">
 <title>access_token信息展示</title>
 </head>
 <body>

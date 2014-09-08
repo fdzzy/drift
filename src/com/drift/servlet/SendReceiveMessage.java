@@ -57,7 +57,7 @@ public class SendReceiveMessage extends HttpServlet {
 		}
 		int friendId = Integer.parseInt(friendIdStr);
 		if(friendId <= 0) {
-			getServletContext().getRequestDispatcher("errorpage.jsp").forward(request, response);
+			getServletContext().getRequestDispatcher(MyServletUtil.errorJspPage).forward(request, response);
 			return;
 		}
 		User friend = null;
@@ -71,7 +71,7 @@ public class SendReceiveMessage extends HttpServlet {
 			
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);
-			getServletContext().getRequestDispatcher("/chat.jsp").forward(request, response);
+			getServletContext().getRequestDispatcher(MyServletUtil.chatJspPage).forward(request, response);
 		} else if(action.equals("receive")) {
 			List<ChatMessage> messages = null;
 			DBResult result = DAO.getNewMessagesFromFriend(user.getUid(), friendId);

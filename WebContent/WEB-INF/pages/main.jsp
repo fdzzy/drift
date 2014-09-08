@@ -1,7 +1,4 @@
-<%@page import="java.sql.Timestamp"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
-<%@page import="java.util.List"%>
-<%@page import="java.text.*"%>
 <%@ page contentType="text/html; charset=utf8" %>
 <%@ page errorPage="errorpage.jsp" %>
 <%@ include file="common.jsp" %>
@@ -55,43 +52,41 @@ setInterval(updateState, 10000);
 <font size=+3><b><%=user.getUsername()%>，欢迎使用漂流瓶应用</b></font>
 </center></p><hr/>
 
-<%
-	List<ChatMessage> messages = (List<ChatMessage>) request.getAttribute("messages");
-%>
 
 <center>
 <p id="msg"></p>
-<table border="1px">
+<table>
 <tr>
-<th>好友名称</th>
-<th>时间</th>
-<th>消息</th>
-<th>操作</th>
+  <td><a href="post_bottle">抛一个</td>
+</tr>
+<tr>
+  <td><a href="get_bottle">捞一个</td>
+</tr>
+<tr>
+  <!-- <td><a href="#" onclick='alert("开发中！")'>我的瓶子</td> -->
+  <td><a href="my_bottle">我的瓶子</td>
+</tr>
+<tr>
+  <td><a href="edit_profile">修改资料</td>
 </tr>
 <%
-	DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	for(ChatMessage message : messages) {
-		int senderId = message.getSenderId();
-		int receiverId = message.getReceiverId();
-		int friendId = (receiverId == user.getUid()) ? senderId : receiverId;
-		User friend = DAO.getUser(friendId);
-		String photoUrl = DAO.getPhotoUrl(friendId);
-		out.println("<tr>");
-		out.println("<td><a href='user.jsp?id=" + friendId + "'><img src=" + photoUrl + " height='30' width='30'/>" 
-	+ friend.getUsername()  + "</a></td>");
-		out.println("<td>" + sdf.format(message.getTs()) + "</td>");
-		String content = message.getContent();
-		if(content.length() > 15) {
-	content = content.substring(0, 15);
-		}
-		out.println("<td>" + content + "</td>");
-		out.println("<td><a href='send_receive?friend=" + friendId + "'>回复</a></td>");
-		out.println("</tr>");
-	}
+if(session.getAttribute(MyServletUtil.SESS_FOREIGN_UID) != null) {
 %>
+<tr>
+  <td><a href="get_keywords">获取微博关键字</td>
+</tr>
+<!-- 
+<tr>
+  <td>${sessionScope.accessToken}</td>
+</tr>
+ -->
+<%
+}
+%>
+<tr>
+  <td><a href="logout">退出</td>
+</tr>
 </table>
-<br/>
-<a href="main.jsp">返回</a>
 </center>
 
 

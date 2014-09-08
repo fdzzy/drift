@@ -1,25 +1,26 @@
 package com.drift.servlet;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.util.SendEmail;
+import com.drift.core.User;
 
 /**
- * Servlet implementation class TestEmailServlet 
+ * Servlet implementation class EditPhotoServlet
  */
-@WebServlet("/test_email")
-public class TestEmailServlet extends HttpServlet {
+@WebServlet("/edit_photo")
+public class EditPhotoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public TestEmailServlet() {
+    public EditPhotoServlet() {
         super();
     }
 
@@ -28,19 +29,13 @@ public class TestEmailServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		MyServletUtil.setCharacterEncoding(request, response);
-		String action = request.getParameter("action");
-		if(action!=null && action.equals("send")) {
-			String toEmail = request.getParameter("email");
-			String subject = request.getParameter("subject");
-			String content = request.getParameter("content");
-			try {
-				SendEmail.send(toEmail, subject, content);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			request.setAttribute("msg", "发送成功");
+		
+		User user = MyServletUtil.checkLogin(request, response);
+		if(user == null) {
+			return;	
 		}
-		getServletContext().getRequestDispatcher(MyServletUtil.testEmailJspPage).forward(request, response);
+		
+		getServletContext().getRequestDispatcher(MyServletUtil.editPhotoJspPage).forward(request, response);
 	}
 
 	/**

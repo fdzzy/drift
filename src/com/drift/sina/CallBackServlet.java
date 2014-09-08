@@ -119,7 +119,7 @@ public class CallBackServlet extends HttpServlet {
 				request.setAttribute("ScreenName", weiboUser.getScreenName());
 				request.setAttribute("Gender", weiboUser.getGender());
 				request.setAttribute("imgUrl", weiboUser.getAvatarLarge());
-				getServletContext().getRequestDispatcher("/third_party_register.jsp").forward(request, response);
+				getServletContext().getRequestDispatcher(MyServletUtil.thirdPartyRegisterJspPage).forward(request, response);
 				break;
 			case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
 				request.setAttribute("msg", "24小时试用期已过，请去邮箱激活");
@@ -132,8 +132,7 @@ public class CallBackServlet extends HttpServlet {
 				if(rtval != DAO.DB_STATUS_OK) {
 					System.err.println("Update access token failed!");
 				}*/
-				//getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
-				response.sendRedirect(getServletContext().getContextPath() + MyServletUtil.mainJspPage);
+				response.sendRedirect(getServletContext().getContextPath() + "/main");
 			default:
 				break;
 			}

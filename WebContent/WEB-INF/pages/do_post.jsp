@@ -18,8 +18,8 @@ String msg = (String)request.getAttribute("msg");
 out.print(msg);
 %>
 <br/>
-<a href="post_bottle.jsp">再发一个</a>&nbsp;
-<a href="main.jsp">返回</a>
+<a href="post_bottle">再发一个</a>&nbsp;
+<a href="main">返回</a>
 </center>
 </body>
 </html>

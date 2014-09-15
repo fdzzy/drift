@@ -10,8 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
+import com.drift.bean.User.SiteType;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.servlet.MyServletUtil;
 
 import weibo4j.Oauth;
@@ -110,9 +111,9 @@ public class CallBackServlet extends HttpServlet {
 			session.setAttribute(MyServletUtil.SESS_FOREIGN_UID, f_uid);
 			session.setAttribute(MyServletUtil.SESS_FOREIGN_ACCESS_TOKEN, accessTokenStr);
 			
-			DBResult result = DAO.getForeignUser(DAO.USER_TYPE_SINA, f_uid);
+			Result result = ServiceFactory.createUserService().loginForeign(SiteType.SINA, f_uid);
 			switch (result.getCode()) {
-			case DAO.DB_STATUS_ERR_USER_NOT_EXIST:
+			case Result.ERR_USER_NOT_EXIST:
 				//out.print("Weibo user not registered yet! redirect to register page<br/>");
 				request.setAttribute("f_uid", f_uid);
 				request.setAttribute("Name", weiboUser.getName());
@@ -121,19 +122,22 @@ public class CallBackServlet extends HttpServlet {
 				request.setAttribute("imgUrl", weiboUser.getAvatarLarge());
 				getServletContext().getRequestDispatcher(MyServletUtil.thirdPartyRegisterJspPage).forward(request, response);
 				break;
-			case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
+			case Result.ERR_USER_NOT_ACTIVATED:
 				request.setAttribute("msg", "24小时试用期已过，请去邮箱激活");
 				getServletContext().getRequestDispatcher(MyServletUtil.loginJspPage).forward(request, response);
 				break;
-			case DAO.DB_STATUS_OK:
-				com.drift.core.User user = (com.drift.core.User) result.getResultObject();
+			case Result.SUCCESS:
+				com.drift.bean.User user = (com.drift.bean.User) result.getResultObject();
 				session.setAttribute(MyServletUtil.SESS_USER, user);
 				/*int rtval = DAO.updateForeignAccessToken(user.getUid(), accessTokenStr);
 				if(rtval != DAO.DB_STATUS_OK) {
 					System.err.println("Update access token failed!");
 				}*/
 				response.sendRedirect(getServletContext().getContextPath() + "/main");
+				break;
 			default:
+				request.setAttribute("msg", "未知错误，请重试");
+				getServletContext().getRequestDispatcher(MyServletUtil.loginJspPage).forward(request, response);
 				break;
 			}
 			/*

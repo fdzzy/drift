@@ -12,17 +12,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
-import com.drift.core.NotificationMessage;
+import com.drift.bean.NotificationMessage;
+import com.drift.service.MessageService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.JSONUtil;
 
 /**
  * Servlet implementation class ApiGetNotification
  */
-@WebServlet(ApiController.API_ROOT + "/get_notification")
+@WebServlet(ApiUtil.API_ROOT + "/get_notification")
 public class ApiGetNotification extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private MessageService mService = ServiceFactory.createMessageService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -36,13 +38,13 @@ public class ApiGetNotification extends HttpServlet {
 	 */
 	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.doCommonTasks(request, response);
-		int status = ApiController.API_ERR_OTHER;
+		ApiUtil.doCommonTasks(request, response);
+		int status = ApiUtil.API_ERR_OTHER;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
 		if(uidStr == null) {
-			status = ApiController.API_ERR_BAD_ARGS;
+			status = ApiUtil.API_ERR_BAD_ARGS;
 		} else {
 			int uid = 0;
 			try {
@@ -50,25 +52,16 @@ public class ApiGetNotification extends HttpServlet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
-			if(uid <= 0 || (DAO.checkUser(uid) ==  false)) {
-				status = ApiController.API_ERR_BAD_USER_ID;
-			} else {
-				List<NotificationMessage> notifications = null;
-				DBResult result = DAO.getNotification(uid);
-				status = ApiController.mapDBCode(result.getCode());
-
-				if(status == ApiController.API_ACTION_OK) {
-					notifications = (List<NotificationMessage>) result.getResultObject();
-					if(notifications == null || notifications.isEmpty()) {
-						status = ApiController.API_ERR_NO_MESSAGE;
-					} else {
-						map.put("messages", notifications);
-					}
-				}
+			
+			Result resultObj = mService.getNotifications(uid);
+			status = ApiUtil.mapCode(resultObj.getCode());
+			
+			List<NotificationMessage> notifications = (List<NotificationMessage>) resultObj.getResultObject();
+			if(resultObj.getCode() == Result.SUCCESS && notifications != null) {
+				map.put("messages", notifications);
 			}
 		}
-		String msg = ApiController.API_CODE_STRINGS.get(status);
+		String msg = ApiUtil.API_CODE_STRINGS.get(status);
 		map.put("code", status);
 		map.put("result", msg);
 		//System.out.println(status);

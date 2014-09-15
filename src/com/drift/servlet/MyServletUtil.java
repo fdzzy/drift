@@ -3,18 +3,15 @@ package com.drift.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.drift.core.DAO;
-import com.drift.core.User;
+import com.drift.bean.User;
 
 public final class MyServletUtil {
 	private static final String pattToJsp = "/WEB-INF/pages";
@@ -74,18 +71,18 @@ public final class MyServletUtil {
 	// REQUEST Variable Constants
 	public static final String REQ_EDIT_PROFILE_USER_STRING = "user";
 	
-	public static DAO getDateDB(ServletContext context) throws Exception {
+	/*public static DAO getDateDB(ServletContext context) throws Exception {
 		DAO dateDB = (DAO)context.getAttribute("dateDB");
 		if(dateDB == null) {
 			dateDB = new DAO();
 			context.setAttribute("dateDB", dateDB);
 		}
 		return dateDB;
-	}
+	}*/
 	
 	@SuppressWarnings("deprecation")
-	public static String timestampToDate(Timestamp ts) {
-		Date date = new Date(ts.getTime());
+	public static String timestampToDate(long ts) {
+		Date date = new Date(ts);
 		int year = date.getYear() + 1900;
 		String yearString = year + "";
 		int month = date.getMonth() + 1;
@@ -96,8 +93,8 @@ public final class MyServletUtil {
 	
 	public static void setCharacterEncoding(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");
-		response.setCharacterEncoding("utf-8");
+		request.setCharacterEncoding("UTF-8"); /* seems this is only useful for POST method, not GET */
+		response.setCharacterEncoding("UTF-8");
 	}
 	
 	// Check to see if logged in, if true then return User
@@ -147,7 +144,7 @@ public final class MyServletUtil {
 		"User has not yet activated"		
 	};
 	
-	public static int getLoginStatusCode(int db_code) {		
+	/*public static int getLoginStatusCode(int db_code) {		
 		int code;
 		
 		switch (db_code) {
@@ -175,7 +172,7 @@ public final class MyServletUtil {
 		}
 		
 		return code;
-	}
+	}*/
 	
 	public static String getLoginMessage(int status) {
 		return API_CODE_LOGIN_STRINGS[status - MyServletUtil.API_CODE_LOGIN_SUCCEED];
@@ -196,7 +193,7 @@ public final class MyServletUtil {
 		"Email has already been registered",
 	};
 	
-	public static int getRegisterStatusCode(int db_code) {		
+	/*public static int getRegisterStatusCode(int db_code) {		
 		int code;
 		
 		switch (db_code) {
@@ -218,7 +215,7 @@ public final class MyServletUtil {
 		}
 		
 		return code;
-	}
+	}*/
 	
 	public static String getRegisterMessage(int status) {
 		return API_CODE_REGISTER_STRINGS[status - MyServletUtil.API_CODE_REGISTER_SUCCEED];

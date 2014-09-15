@@ -1,4 +1,4 @@
-package com.drift.core;
+package com.drift.bean;
 
 //import java.io.InputStream;
 import java.sql.Connection;
@@ -18,11 +18,14 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import com.drift.service.impl.Result;
 import com.drift.servlet.MyServletUtil;
 import com.drift.util.MD5Util;
 import com.drift.util.SendEmail;
 
-
+/**
+ * @deprecated
+ */
 public class DAO {
 	
 	// Error status code
@@ -349,7 +352,7 @@ public class DAO {
 	 *	0:		succeed
 	 *	< 0:	error
 	 */
-	static public DBResult registerForeign(int type,
+	static public Result registerForeign(int type,
 			String f_uid,
 			String username,
 			String nickname,
@@ -369,7 +372,7 @@ public class DAO {
 		PreparedStatement insertPrepStmt = null;
 		PreparedStatement selectPrepStmt3 = null;
 		ResultSet selectRs3 = null;
-		DBResult result = new DBResult();
+		Result result = new Result();
 		
 		if(type <= USER_TYPE_THIS_SITE || type >= USER_TYPE_MAX || 
 			f_uid == null || f_uid.isEmpty() ||
@@ -538,11 +541,11 @@ public class DAO {
 		return rtval;
 	}
   
-	static public DBResult login(String username, String password) {
+	static public Result login(String username, String password) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
-		DBResult result = new DBResult();
+		Result result = new Result();
 		
 		if(username == null || username.isEmpty() ||
 				password == null || password.isEmpty()) {
@@ -762,58 +765,58 @@ public class DAO {
 	 *	null: error
 	 */
 	static public User getUser(int userId) {
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
+//		Connection con=null;
+//		PreparedStatement prepStmt=null;
+//		ResultSet rs=null;
 		User user = null;
-		
-		if(userId <= 0) {
-			return null;
-		}
-
-		try {
-			con=getConnection();
-			String selectStatement = "select NAME, NICKNAME, SEX, SCHOOL, DEPARTMENT, MAJOR, EMAIL" 
-					+ ", BIRTHDAY, ENROLLYEAR, REGISTER_TIME from users where ID=?";
-			prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setInt(1, userId);
-			rs = prepStmt.executeQuery();
-
-			if (rs.next()) {
-				String name = rs.getString(1);
-				String nickname = rs.getString(2);
-				int sex = rs.getInt(3);
-				String school = rs.getString(4);
-				String department = rs.getString(5);
-				String major = rs.getString(6);
-				String email = rs.getString(7);
-				String birthday = rs.getString(8);
-				String enrollYear = rs.getString(9);
-				java.sql.Timestamp ts = rs.getTimestamp(10);
-				
-				user = new User(userId, name, nickname, Gender.makeGender(sex), school, department, major, email, birthday, enrollYear, ts);
-			} else {
-				//username does not exist in DB
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			closeResultSet(rs);
-			closePrepStmt(prepStmt);
-			closeConnection(con);
-		}
+//
+//		if(userId <= 0) {
+//			return null;
+//		}
+//
+//		try {
+//			con=getConnection();
+//			String selectStatement = "select NAME, NICKNAME, SEX, SCHOOL, DEPARTMENT, MAJOR, EMAIL" 
+//					+ ", BIRTHDAY, ENROLLYEAR, REGISTER_TIME from users where ID=?";
+//			prepStmt = con.prepareStatement(selectStatement);
+//			prepStmt.setInt(1, userId);
+//			rs = prepStmt.executeQuery();
+//
+//			if (rs.next()) {
+//				String name = rs.getString(1);
+//				String nickname = rs.getString(2);
+//				int sex = rs.getInt(3);
+//				String school = rs.getString(4);
+//				String department = rs.getString(5);
+//				String major = rs.getString(6);
+//				String email = rs.getString(7);
+//				String birthday = rs.getString(8);
+//				String enrollYear = rs.getString(9);
+//				java.sql.Timestamp ts = rs.getTimestamp(10);
+//
+//				user = new User(userId, name, nickname, Gender.makeGender(sex), school, department, major, email, birthday, enrollYear, ts);
+//			} else {
+//				//username does not exist in DB
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}finally{
+//			closeResultSet(rs);
+//			closePrepStmt(prepStmt);
+//			closeConnection(con);
+//		}
 		return user;
 	}
  
 	/*
 	 * Get a foreign site user
 	 */
-	static public DBResult getForeignUser(int type, String f_uid) {
+	static public Result getForeignUser(int type, String f_uid) {
 		Connection con=null;
 		PreparedStatement prepStmt=null;
 		ResultSet rs=null;
 		User user = null;
-		DBResult result = new DBResult();
+		Result result = new Result();
 		
 		if(type < 0 || f_uid == null || f_uid.isEmpty()) {
 			result.setCode(DB_STATUS_ERR_BAD_ARGS);
@@ -1001,42 +1004,42 @@ public class DAO {
 	 *	
 	 */
 	static public String getPhotoUrl(int uid) {
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
+//		Connection con=null;
+//		PreparedStatement prepStmt=null;
+//		ResultSet rs=null;
 		String url = null;
 		
-		if(uid <= 0) {
-			return null;
-		}
-
-		try {
-			con=getConnection();
-			// Update photo filename in Database
-			String selectStatement = "select SEX, REGISTER_TIME, PHOTO from users where ID=?";
-			prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setInt(1, uid);
-			rs = prepStmt.executeQuery();
-			
-			if(rs.next()) {
-				int sex = rs.getInt(1);
-				Timestamp ts = rs.getTimestamp(2);
-				String photoFilename = rs.getString(3);
-				
-				if(photoFilename == null || photoFilename.isEmpty()) {
-					url = "img/" + Gender.makeGender(sex).toString() + ".jpg";
-				} else {
-					url = "photo/" + MyServletUtil.timestampToDate(ts) + "/" + uid
-							+ "/" + photoFilename;
-				}
-			} 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			closeResultSet(rs);
-			closePrepStmt(prepStmt);
-			closeConnection(con);
-		}
+//		if(uid <= 0) {
+//			return null;
+//		}
+//
+//		try {
+//			con=getConnection();
+//			// Update photo filename in Database
+//			String selectStatement = "select SEX, REGISTER_TIME, PHOTO from users where ID=?";
+//			prepStmt = con.prepareStatement(selectStatement);
+//			prepStmt.setInt(1, uid);
+//			rs = prepStmt.executeQuery();
+//			
+//			if(rs.next()) {
+//				int sex = rs.getInt(1);
+//				Timestamp ts = rs.getTimestamp(2);
+//				String photoFilename = rs.getString(3);
+//				
+//				if(photoFilename == null || photoFilename.isEmpty()) {
+//					url = "img/" + Gender.makeGender(sex).toString() + ".jpg";
+//				} else {
+//					url = "photo/" + MyServletUtil.timestampToDate(ts) + "/" + uid
+//							+ "/" + photoFilename;
+//				}
+//			} 
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}finally{
+//			closeResultSet(rs);
+//			closePrepStmt(prepStmt);
+//			closeConnection(con);
+//		}
 		return url;
 	}
 	
@@ -1044,71 +1047,71 @@ public class DAO {
 	 * 	
 	 * TODO: This function should be synchronized
 	 */
-	static public DBResult getBottle(int uid) {
-		Connection con = null;
-		PreparedStatement prepStmt = null;
-		ResultSet rs = null;
-		PreparedStatement prepStmt2 = null;
-		ResultSet rs2 = null;
-		PreparedStatement updatePrepStmt = null;
-		int sex = 0;
-		DBResult result = new DBResult();
-		Bottle bottle = null;
-		
-		if(uid <= 0) {
-			result.setCode(DB_STATUS_ERR_BAD_ARGS);
-			return result;
-		}
-
-		try {
-			con=getConnection();
-			String selectStatement = "select SEX from users where ID=?";
-			prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setInt(1, uid);
-			rs = prepStmt.executeQuery();
-
-			if (rs.next()) {
-				//id = rs.getInt(1);
-				sex = rs.getInt(1);
-				//sex = sex.equals("male") ? "female" : "male";
-				sex = sex ^ 1;
-				selectStatement = "select users.name, bottles.id, bottles.sender, bottles.content from bottles, users "
-						+ "where bottles.sender=users.id and users.sex=? and bottles.receiver=0 order by rand() limit 1";
-				prepStmt2 = con.prepareStatement(selectStatement);
-				prepStmt2.setInt(1, sex);
-				rs2 = prepStmt2.executeQuery();
-				if(rs2.next()) {
-					String senderName = rs2.getString(1);
-					int bottleId = rs2.getInt(2);
-					int senderId= rs2.getInt(3);
-					String content = rs2.getString(4);
-					String updateStatement = "UPDATE `bottles` SET `receiver`=? WHERE `ID`=?"; 
-					updatePrepStmt = con.prepareStatement(updateStatement);
-					updatePrepStmt.setInt(1, uid);
-					updatePrepStmt.setInt(2, bottleId);
-					if(updatePrepStmt.executeUpdate() != 0) {
-						bottle = new Bottle(bottleId, senderId, senderName, content);
-						result.setResultObject(bottle);
-						result.setCode(DB_STATUS_OK);
-					}
-				} else {
-					// No bottle left
-					result.setCode(DB_STATUS_ERR_NO_BOTTLE);
-				}
-			} else {
-				//username does not exist in DB
-				result.setCode(DB_STATUS_ERR_USER_ID);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			closeResultSet(rs2);
-			closeResultSet(rs);
-			closePrepStmt(prepStmt2);
-			closePrepStmt(prepStmt);
-			closePrepStmt(updatePrepStmt);
-			closeConnection(con);
-		}
+	static public Result getBottle(int uid) {
+//		Connection con = null;
+//		PreparedStatement prepStmt = null;
+//		ResultSet rs = null;
+//		PreparedStatement prepStmt2 = null;
+//		ResultSet rs2 = null;
+//		PreparedStatement updatePrepStmt = null;
+//		int sex = 0;
+		Result result = new Result();
+//		Bottle bottle = null;
+//		
+//		if(uid <= 0) {
+//			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+//			return result;
+//		}
+//
+//		try {
+//			con=getConnection();
+//			String selectStatement = "select SEX from users where ID=?";
+//			prepStmt = con.prepareStatement(selectStatement);
+//			prepStmt.setInt(1, uid);
+//			rs = prepStmt.executeQuery();
+//
+//			if (rs.next()) {
+//				//id = rs.getInt(1);
+//				sex = rs.getInt(1);
+//				//sex = sex.equals("male") ? "female" : "male";
+//				sex = sex ^ 1;
+//				selectStatement = "select users.name, bottles.id, bottles.sender, bottles.content from bottles, users "
+//						+ "where bottles.sender=users.id and users.sex=? and bottles.receiver=0 order by rand() limit 1";
+//				prepStmt2 = con.prepareStatement(selectStatement);
+//				prepStmt2.setInt(1, sex);
+//				rs2 = prepStmt2.executeQuery();
+//				if(rs2.next()) {
+//					String senderName = rs2.getString(1);
+//					int bottleId = rs2.getInt(2);
+//					int senderId= rs2.getInt(3);
+//					String content = rs2.getString(4);
+//					String updateStatement = "UPDATE `bottles` SET `receiver`=? WHERE `ID`=?"; 
+//					updatePrepStmt = con.prepareStatement(updateStatement);
+//					updatePrepStmt.setInt(1, uid);
+//					updatePrepStmt.setInt(2, bottleId);
+//					if(updatePrepStmt.executeUpdate() != 0) {
+//						bottle = new Bottle(bottleId, senderId, senderName, content);
+//						result.setResultObject(bottle);
+//						result.setCode(DB_STATUS_OK);
+//					}
+//				} else {
+//					// No bottle left
+//					result.setCode(DB_STATUS_ERR_NO_BOTTLE);
+//				}
+//			} else {
+//				//username does not exist in DB
+//				result.setCode(DB_STATUS_ERR_USER_ID);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}finally{
+//			closeResultSet(rs2);
+//			closeResultSet(rs);
+//			closePrepStmt(prepStmt2);
+//			closePrepStmt(prepStmt);
+//			closePrepStmt(updatePrepStmt);
+//			closeConnection(con);
+//		}
 		return result;
 	}
 
@@ -1206,78 +1209,78 @@ public class DAO {
 	 * Also get the latest message with that friend
 	 * 
 	 */
-	static public DBResult getMyBottles(int uid, int start, int length)
+	static public Result getMyBottles(int uid, int start, int length)
 	{
-		Connection con = null;
-		PreparedStatement prepStmt = null;
-		ResultSet rs = null;
-		PreparedStatement updatePrepStmt = null;
-		//Set<User> friends = new TreeSet<User>();
-		List<ChatMessage> messages = new ArrayList<ChatMessage>();
-		DBResult result = new DBResult();
-		
-		if(uid <= 0) {
-			result.setCode(DB_STATUS_ERR_BAD_ARGS);
-			return result;
-		}
-		
-		if(checkUser(uid) == false) {
-			result.setCode(DB_STATUS_ERR_USER_ID);
-			return result;
-		}
-
-		try {
-			con = getConnection();
-			/*String selectStatement = "select ID, senderID, sendTime, content from messages where ID in " + 
-					"(select max(ID) from messages where receiverID=" + uid + " group by senderID)"
-					+ " order by sendTime DESC limit " + start + "," + length;*/
-			/*
-			 * select ID, senderID, receiverID, sendTime, content from messages where ID in (select max(ID) from (select * from (select ID, senderID as friend, sendTime from messages where receiverID=15) as a UNION (select ID, receiverID as friend, sendTime from messages where senderID=15)) as b group by friend) order by sendTime DESC limit 0, 30;
-			 */
-			String selectStatement = "select ID, senderID, receiverID, sendTime, content from messages " + 
-				"where ID in (select max(ID) from (select * from (select ID, senderID as friend, sendTime " + 
-				"from messages where receiverID=?) as a UNION (select ID, receiverID as friend, sendTime " + 
-				"from messages where senderID=?)) as b group by friend) order by sendTime DESC limit ?, ?";
-			prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setInt(1, uid);
-			prepStmt.setInt(2, uid);
-			prepStmt.setInt(3, start);
-			prepStmt.setInt(4, length);
-			rs = prepStmt.executeQuery();
-
-			while (rs.next()) {
-				int messageId = rs.getInt(1);
-				int senderId = rs.getInt(2);
-				int receiverId = rs.getInt(3);
-				Timestamp ts = rs.getTimestamp(4);
-				String content = rs.getString(5);
-				
-				User senderUser = getUser(senderId);
-				User receiverUser = getUser(receiverId);
-				
-				ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
-						receiverId, receiverUser.getUsername(), ts, content);
-				messages.add(message);
-			}
-			/*
-			 * Do not set the readFlag until the message is read from chat.jsp or get_unread
-			String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `receiverID`=?"; 
-			updatePrepStmt = con.prepareStatement(updateStatement);
-			updatePrepStmt.setInt(1, uid);
-			if(updatePrepStmt.executeUpdate() != 0) {
-				// anything to do?
-			}
-			*/
-			result.setResultObject(messages);
-			result.setCode(DB_STATUS_OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			closeResultSet(rs);
-			closePrepStmt(prepStmt);
-			closePrepStmt(updatePrepStmt);
-			closeConnection(con);
-		}
+//		Connection con = null;
+//		PreparedStatement prepStmt = null;
+//		ResultSet rs = null;
+//		PreparedStatement updatePrepStmt = null;
+//		//Set<User> friends = new TreeSet<User>();
+//		List<ChatMessage> messages = new ArrayList<ChatMessage>();
+		Result result = new Result();
+//		
+//		if(uid <= 0) {
+//			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+//			return result;
+//		}
+//		
+//		if(checkUser(uid) == false) {
+//			result.setCode(DB_STATUS_ERR_USER_ID);
+//			return result;
+//		}
+//
+//		try {
+//			con = getConnection();
+//			/*String selectStatement = "select ID, senderID, sendTime, content from messages where ID in " + 
+//					"(select max(ID) from messages where receiverID=" + uid + " group by senderID)"
+//					+ " order by sendTime DESC limit " + start + "," + length;*/
+//			/*
+//			 * select ID, senderID, receiverID, sendTime, content from messages where ID in (select max(ID) from (select * from (select ID, senderID as friend, sendTime from messages where receiverID=15) as a UNION (select ID, receiverID as friend, sendTime from messages where senderID=15)) as b group by friend) order by sendTime DESC limit 0, 30;
+//			 */
+//			String selectStatement = "select ID, senderID, receiverID, sendTime, content from messages " + 
+//				"where ID in (select max(ID) from (select * from (select ID, senderID as friend, sendTime " + 
+//				"from messages where receiverID=?) as a UNION (select ID, receiverID as friend, sendTime " + 
+//				"from messages where senderID=?)) as b group by friend) order by sendTime DESC limit ?, ?";
+//			prepStmt = con.prepareStatement(selectStatement);
+//			prepStmt.setInt(1, uid);
+//			prepStmt.setInt(2, uid);
+//			prepStmt.setInt(3, start);
+//			prepStmt.setInt(4, length);
+//			rs = prepStmt.executeQuery();
+//
+//			while (rs.next()) {
+//				int messageId = rs.getInt(1);
+//				int senderId = rs.getInt(2);
+//				int receiverId = rs.getInt(3);
+//				Timestamp ts = rs.getTimestamp(4);
+//				String content = rs.getString(5);
+//				
+//				User senderUser = getUser(senderId);
+//				User receiverUser = getUser(receiverId);
+//				
+//				ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
+//						receiverId, receiverUser.getUsername(), ts, content);
+//				messages.add(message);
+//			}
+//			/*
+//			 * Do not set the readFlag until the message is read from chat.jsp or get_unread
+//			String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `receiverID`=?"; 
+//			updatePrepStmt = con.prepareStatement(updateStatement);
+//			updatePrepStmt.setInt(1, uid);
+//			if(updatePrepStmt.executeUpdate() != 0) {
+//				// anything to do?
+//			}
+//			*/
+//			result.setResultObject(messages);
+//			result.setCode(DB_STATUS_OK);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}finally{
+//			closeResultSet(rs);
+//			closePrepStmt(prepStmt);
+//			closePrepStmt(updatePrepStmt);
+//			closeConnection(con);
+//		}
 		return result;
 	}
 	
@@ -1286,65 +1289,65 @@ public class DAO {
 	 * 
 	 * Get the messages with the specific friend, and set readFlag to 1
 	 */
-	static public DBResult getConversation(int uid, int friendId)
+	static public Result getConversation(int uid, int friendId)
 	{
-		Connection con = null;
-		PreparedStatement prepStmt = null;
-		PreparedStatement updatePrepStmt = null;
-		ResultSet rs = null;
-		List<ChatMessage> messages = new ArrayList<ChatMessage>();
-		DBResult result = new DBResult();
-		
-		if(uid <= 0 || friendId <= 0) {
-			result.setCode(DB_STATUS_ERR_BAD_ARGS);
-			return result;
-		}
-
-		try {
-			con=getConnection();
-			String selectStatement = "select ID, senderID, receiverID, sendTime, content, readFlag " + 
-					" from messages where (receiverID=? and senderID=?) or (receiverID=? and " + 
-					"senderID=?) order by sendTime ASC, ID ASC";// limit 0, 30";
-			prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setInt(1, uid);
-			prepStmt.setInt(2, friendId);
-			prepStmt.setInt(3, friendId);
-			prepStmt.setInt(4, uid);
-			rs = prepStmt.executeQuery();
-
-			while (rs.next()) {
-				int messageId = rs.getInt(1);
-				int senderId = rs.getInt(2);
-				int receiverId = rs.getInt(3);
-				int readFlag = rs.getInt(6);
-				Timestamp ts = rs.getTimestamp(4);
-				String content = rs.getString(5);
-				
-				User senderUser = getUser(senderId);
-				User receiverUser = getUser(receiverId);
-				
-				ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
-						receiverId, receiverUser.getUsername(), ts, content);
-				messages.add(message);
-				// set readFlag to 1
-				if(readFlag == 0) {
-					String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `receiverID`=?"; 
-					updatePrepStmt = con.prepareStatement(updateStatement);
-					updatePrepStmt.setInt(1, uid);
-					if(updatePrepStmt.executeUpdate() != 0) {
-						// anything to do?
-					}
-				}
-			}
-			result.setResultObject(messages);
-			result.setCode(DB_STATUS_OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			closeResultSet(rs);
-			closePrepStmt(prepStmt);
-			closeConnection(con);
-		}
+//		Connection con = null;
+//		PreparedStatement prepStmt = null;
+//		PreparedStatement updatePrepStmt = null;
+//		ResultSet rs = null;
+//		List<ChatMessage> messages = new ArrayList<ChatMessage>();
+		Result result = new Result();
+//		
+//		if(uid <= 0 || friendId <= 0) {
+//			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+//			return result;
+//		}
+//
+//		try {
+//			con=getConnection();
+//			String selectStatement = "select ID, senderID, receiverID, sendTime, content, readFlag " + 
+//					" from messages where (receiverID=? and senderID=?) or (receiverID=? and " + 
+//					"senderID=?) order by sendTime ASC, ID ASC";// limit 0, 30";
+//			prepStmt = con.prepareStatement(selectStatement);
+//			prepStmt.setInt(1, uid);
+//			prepStmt.setInt(2, friendId);
+//			prepStmt.setInt(3, friendId);
+//			prepStmt.setInt(4, uid);
+//			rs = prepStmt.executeQuery();
+//
+//			while (rs.next()) {
+//				int messageId = rs.getInt(1);
+//				int senderId = rs.getInt(2);
+//				int receiverId = rs.getInt(3);
+//				int readFlag = rs.getInt(6);
+//				Timestamp ts = rs.getTimestamp(4);
+//				String content = rs.getString(5);
+//				
+//				User senderUser = getUser(senderId);
+//				User receiverUser = getUser(receiverId);
+//				
+//				ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
+//						receiverId, receiverUser.getUsername(), ts, content);
+//				messages.add(message);
+//				// set readFlag to 1
+//				if(readFlag == 0) {
+//					String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `receiverID`=?"; 
+//					updatePrepStmt = con.prepareStatement(updateStatement);
+//					updatePrepStmt.setInt(1, uid);
+//					if(updatePrepStmt.executeUpdate() != 0) {
+//						// anything to do?
+//					}
+//				}
+//			}
+//			result.setResultObject(messages);
+//			result.setCode(DB_STATUS_OK);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}finally{
+//			closeResultSet(rs);
+//			closePrepStmt(prepStmt);
+//			closeConnection(con);
+//		}
 		return result;
 	}
 	
@@ -1353,57 +1356,57 @@ public class DAO {
 	 * 
 	 * Get new unread messages from the specific friend, and set readFlag to 1
 	 */
-	static public DBResult getNewMessagesFromFriend(int uid, int friendId)
+	static public Result getNewMessagesFromFriend(int uid, int friendId)
 	{
-		Connection con=null;
-		PreparedStatement prepStmt=null;
-		ResultSet rs=null;
-		List<ChatMessage> messages = new ArrayList<ChatMessage>();
-		DBResult result = new DBResult();
-		
-		if(uid <= 0 || friendId <= 0) {
-			result.setCode(DB_STATUS_ERR_BAD_ARGS);
-			return result;
-		}
-
-		try {
-			con=getConnection();
-			String selectStatement = "select ID, senderID, receiverID, sendTime, content, readFlag " + 
-					" from messages where receiverID=? and senderID=? and readFlag=0" + 
-					" order by sendTime ASC, ID ASC";
-			prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setInt(1, uid);
-			prepStmt.setInt(2, friendId);
-			rs = prepStmt.executeQuery();
-
-			while (rs.next()) {
-				int messageId = rs.getInt(1);
-				int senderId = rs.getInt(2);
-				int receiverId = rs.getInt(3);
-				Timestamp ts = rs.getTimestamp(4);
-				String content = rs.getString(5);
-				
-				User senderUser = getUser(senderId);
-				User receiverUser = getUser(receiverId);
-				
-				String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `ID`=?"; 
-				prepStmt = con.prepareStatement(updateStatement);
-				prepStmt.setInt(1, messageId);
-				if(prepStmt.executeUpdate() != 0) {
-					ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
-							receiverId, receiverUser.getUsername(), ts, content);
-					messages.add(message);
-				}				
-			}
-			result.setResultObject(messages);
-			result.setCode(DB_STATUS_OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			closeResultSet(rs);
-			closePrepStmt(prepStmt);
-			closeConnection(con);
-		}
+//		Connection con=null;
+//		PreparedStatement prepStmt=null;
+//		ResultSet rs=null;
+//		List<ChatMessage> messages = new ArrayList<ChatMessage>();
+		Result result = new Result();
+//		
+//		if(uid <= 0 || friendId <= 0) {
+//			result.setCode(DB_STATUS_ERR_BAD_ARGS);
+//			return result;
+//		}
+//
+//		try {
+//			con=getConnection();
+//			String selectStatement = "select ID, senderID, receiverID, sendTime, content, readFlag " + 
+//					" from messages where receiverID=? and senderID=? and readFlag=0" + 
+//					" order by sendTime ASC, ID ASC";
+//			prepStmt = con.prepareStatement(selectStatement);
+//			prepStmt.setInt(1, uid);
+//			prepStmt.setInt(2, friendId);
+//			rs = prepStmt.executeQuery();
+//
+//			while (rs.next()) {
+//				int messageId = rs.getInt(1);
+//				int senderId = rs.getInt(2);
+//				int receiverId = rs.getInt(3);
+//				Timestamp ts = rs.getTimestamp(4);
+//				String content = rs.getString(5);
+//				
+//				User senderUser = getUser(senderId);
+//				User receiverUser = getUser(receiverId);
+//				
+//				String updateStatement = "UPDATE `messages` SET `readFlag`=1 WHERE `ID`=?"; 
+//				prepStmt = con.prepareStatement(updateStatement);
+//				prepStmt.setInt(1, messageId);
+//				if(prepStmt.executeUpdate() != 0) {
+//					ChatMessage message = new ChatMessage(messageId, senderId, senderUser.getUsername(),
+//							receiverId, receiverUser.getUsername(), ts, content);
+//					messages.add(message);
+//				}				
+//			}
+//			result.setResultObject(messages);
+//			result.setCode(DB_STATUS_OK);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}finally{
+//			closeResultSet(rs);
+//			closePrepStmt(prepStmt);
+//			closeConnection(con);
+//		}
 		return result;
 	} 
 	
@@ -1448,7 +1451,7 @@ public class DAO {
 	 *  	unreadCount: number of unread messages from him/her
 	 *  	
 	 */
-	static public DBResult getNotification(int uid)
+	static public Result getNotification(int uid)
 	{
 		Connection con = null;
 		PreparedStatement prepStmt1 = null;
@@ -1457,7 +1460,7 @@ public class DAO {
 		ResultSet rs1 = null;
 		ResultSet rs2 = null;
 		ResultSet rs3 = null;
-		DBResult result = new DBResult();
+		Result result = new Result();
 		List<NotificationMessage> notifications = new ArrayList<>();
 		
 		if(uid <= 0) {

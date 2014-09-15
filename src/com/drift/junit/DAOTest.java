@@ -4,7 +4,7 @@ package com.drift.junit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import com.drift.core.DAO;
+//import com.drift.bean.DAO;
 
 
 import junit.framework.TestCase;

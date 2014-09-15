@@ -8,8 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.MessageService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class PostBottleServlet
@@ -17,6 +19,7 @@ import com.drift.core.User;
 @WebServlet("/post_bottle")
 public class PostBottleServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private MessageService mService = ServiceFactory.createMessageService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -42,12 +45,10 @@ public class PostBottleServlet extends HttpServlet {
 			String content = request.getParameter("content");
 			System.out.println("\"" + user.getUsername() + "\"" + "发送了消息：\"" + content + "\"");
 			
-			int rtval = 0;
-			rtval = DAO.postBottle(user.getUid(), content);
-			
-			String msg;
-			switch (rtval) {
-			case DAO.DB_STATUS_OK:
+			int result = mService.sendBottle(user, content);						
+			String msg = null;
+			switch (result) {
+			case Result.SUCCESS:
 				msg = "<font color='green'>发送成功！</font>";
 				break;
 			default:

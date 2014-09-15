@@ -1,4 +1,4 @@
-<%@ page import="com.drift.core.*" %>
+<%@ page import="com.drift.bean.*" %>
 <%@ page errorPage="errorpage.jsp" %>
 
 <%

@@ -1,6 +1,6 @@
 package com.drift.junit;
 
-import com.drift.core.Gender;
+import com.drift.bean.Gender;
 
 import junit.framework.TestCase;
 

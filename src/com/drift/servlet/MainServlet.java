@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.User;
+import com.drift.bean.User;
 
 /**
  * Servlet implementation class MainServlet

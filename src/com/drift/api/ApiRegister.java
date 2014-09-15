@@ -11,15 +11,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.JSONUtil;
 
 /**
  * Servlet implementation class ApiRegister
  */
-@WebServlet(ApiController.API_ROOT + "/register")
+@WebServlet(ApiUtil.API_ROOT + "/register")
 public class ApiRegister extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UserService service = ServiceFactory.createUserService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -32,7 +36,7 @@ public class ApiRegister extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.doCommonTasks(request, response);
+		ApiUtil.doCommonTasks(request, response);
 		
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
@@ -42,7 +46,7 @@ public class ApiRegister extends HttpServlet {
 		String school = request.getParameter("school");
 		String department = request.getParameter("department");
 		String major = request.getParameter("major");
-		String enrollYear = request.getParameter("enrollYear");
+		String enrollYearStr = request.getParameter("enrollYear");
 		String email = request.getParameter("email");
 
 		if(birthday == null || birthday.isEmpty())
@@ -55,10 +59,26 @@ public class ApiRegister extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		int result = DAO.register(username, nickname, password, sex, birthday, 
-				school, department, major, enrollYear, email);
-		int status = ApiController.mapDBCode(result);
-		String msg = ApiController.API_CODE_STRINGS.get(status);
+		int enrollYear = 0;		
+		try {
+			enrollYear = Integer.parseInt(enrollYearStr);
+		} catch (Exception e) {
+			// This is not an issue
+		}
+
+		User user = null;
+		int result = Result.ERR_GENERIC;
+		try {
+			user = new User(username, nickname, sex, school, department,
+					major, email, birthday, enrollYear);
+		} catch (Exception e) {
+			result = Result.ERR_BAD_ARGS;
+		}
+		if(result != Result.ERR_BAD_ARGS) {
+			result = service.register(user, password);
+		}
+		int status = ApiUtil.mapCode(result);
+		String msg = ApiUtil.API_CODE_STRINGS.get(status);
 		//System.out.println(result.getCode() + " " + status);
 
 		Map<String, Object> map = new HashMap<String, Object>();

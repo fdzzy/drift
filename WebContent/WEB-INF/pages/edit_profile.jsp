@@ -1,5 +1,5 @@
 <%@page import="com.drift.servlet.MyServletUtil"%>
-<%@page import="com.drift.core.User"%>
+<%@page import="com.drift.bean.User"%>
 <%@ page contentType="text/html; charset=utf8" %>
 <%@ page errorPage="errorpage.jsp" %>
 <%@ include file="common.jsp" %>
@@ -20,7 +20,7 @@ function openwin() {
 	window.open("edit_photo","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
 }
 function openwin2() {
-	window.open("edit_photo2.jsp","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
+	window.open("edit_photo2","", "height=500,width=800,toolbars=0,status=0,resizable=1,scrollbars=0");
 }
 -->
 </script>
@@ -37,10 +37,6 @@ if(user == null) {
 <%
 	return;
 }
-
-// the profile may have changed
-user = DAO.getUser(user.getUid());
-session.setAttribute(MyServletUtil.SESS_USER, user);
 
 String msg =(String)request.getAttribute("msg");
 String photoUrl = (String)request.getAttribute("photoUrl");

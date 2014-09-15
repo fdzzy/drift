@@ -11,15 +11,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
+import com.drift.service.MessageService;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.JSONUtil;
 
 /**
  * Servlet implementation class ApiSendBack
  */
-@WebServlet(ApiController.API_ROOT + "/send_back")
+@WebServlet(ApiUtil.API_ROOT + "/send_back")
 public class ApiSendBack extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private MessageService mService = ServiceFactory.createMessageService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -32,13 +34,13 @@ public class ApiSendBack extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.doCommonTasks(request, response);
-		int status = ApiController.API_ERR_OTHER;
+		ApiUtil.doCommonTasks(request, response);
+		int status = ApiUtil.API_ERR_OTHER;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String bidStr = request.getParameter("bid");
 		if(bidStr == null) {
-			status = ApiController.API_ERR_BAD_ARGS;
+			status = ApiUtil.API_ERR_BAD_ARGS;
 		} else {
 			int bid = 0;
 
@@ -48,10 +50,10 @@ public class ApiSendBack extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			int rtval = DAO.setBottleUnread(bid);
-			status = ApiController.mapDBCode(rtval);
+			int result = mService.sendBackBottle(bid);
+			status = ApiUtil.mapCode(result);
 		}
-		String msg = ApiController.API_CODE_STRINGS.get(status);
+		String msg = ApiUtil.API_CODE_STRINGS.get(status);
 		map.put("code", status);
 		map.put("result", msg);
 		//System.out.println(status);

@@ -22,7 +22,7 @@ function createXMLHttp() {
 
 function checkUsername(uname) {
 	createXMLHttp();
-	xmlHttp.open("POST", "check_username?username="+encodeURI(uname));
+	xmlHttp.open("GET", "check_username?username="+encodeURI(uname));
 	xmlHttp.onreadystatechange = function(){
 			if(xmlHttp.readyState == 4) {
 				if(xmlHttp.status == 200) {
@@ -38,6 +38,36 @@ function checkUsername(uname) {
 	xmlHttp.send(null);
 	document.getElementById("uname_msg").innerHTML = "<font color='green'>正在验证...</font>";
 }
+
+var emailOK = false;
+function checkEmail(email) {
+	if(email.replace(/\s+/g,'')=='') {
+		document.getElementById("email_msg").innerHTML = "<font color='red'>邮箱不能为空！</font>";
+		return;
+	}
+	createXMLHttp();
+	xmlHttp.open("GET", "check_email?email="+encodeURI(email));
+	xmlHttp.onreadystatechange = function(){
+			if(xmlHttp.readyState == 4) {
+				if(xmlHttp.status == 200) {
+					var text = xmlHttp.responseText;
+					if(text == "ok") {
+						emailOK = true;
+						document.getElementById("email_msg").innerHTML = "<font color='green'>可使用此邮箱！</font>";
+					} else if(text == "exist"){
+						emailOK = false;
+						document.getElementById("email_msg").innerHTML = "<font color='red'>此邮箱已被占用！</font>";
+					} else {
+						emailOK = false;
+						document.getElementById("email_msg").innerHTML = "<font color='red'>此邮箱不可用！</font>";
+					}
+				}
+			}
+	};
+	xmlHttp.send(null);
+	document.getElementById("msg").innerHTML = "<font color='green'>正在验证...</font>";
+}
+
 
 function checkDate(dateStr) {
 	var pattern = new RegExp("\\d{4}\\-\\d{2}-\\d{2}");
@@ -92,6 +122,10 @@ function checkinfo(f) {
 	} else if(checkDate(f.birthday.value) == false) {
 	    alert('生日错误！');
 		f.birthday.focus();
+		return false;
+	} else if(emailOK == false) {
+		alert('邮箱错误！');
+		f.email.focus();
 		return false;
 	}
 		
@@ -178,8 +212,12 @@ if(msg!=null && !msg.isEmpty()) {
 </tr>
 <tr>
   <td>邮箱：</td>
-  <td><input type="email" name="email" size="25"></td>
+  <td><input type="email" name="email" size="25" onblur="checkEmail(this.value)"></td>
   <td>*</td>
+</tr>
+<tr>
+  <td></td>
+  <td id="email_msg"></td>
 </tr>
 </table>
 </center>

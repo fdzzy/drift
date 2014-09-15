@@ -1,3 +1,5 @@
+<%@page import="com.drift.service.impl.ServiceFactory"%>
+<%@page import="com.drift.service.UserService"%>
 <%@page import="java.sql.Timestamp"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
 <%@page import="java.util.List"%>
@@ -70,12 +72,13 @@ setInterval(updateState, 10000);
 </tr>
 <%
 	DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    UserService uService = ServiceFactory.createUserService();
 	for(ChatMessage message : messages) {
 		int senderId = message.getSenderId();
 		int receiverId = message.getReceiverId();
 		int friendId = (receiverId == user.getUid()) ? senderId : receiverId;
-		User friend = DAO.getUser(friendId);
-		String photoUrl = DAO.getPhotoUrl(friendId);
+		User friend = (User)uService.getUserById(friendId).getResultObject();
+		String photoUrl = uService.getFullPhotoUrl(friend);
 		out.println("<tr>");
 		out.println("<td><a href='show_user?id=" + friendId + "'><img src=" + photoUrl + " height='30' width='30'/>" 
 	+ friend.getUsername()  + "</a></td>");

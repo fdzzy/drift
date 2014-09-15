@@ -9,11 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
-
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class ApiLogin
@@ -21,6 +20,7 @@ import com.drift.core.User;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UserService service = ServiceFactory.createUserService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -56,31 +56,31 @@ public class LoginServlet extends HttpServlet {
 		String page = MyServletUtil.loginJspPage;
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		DBResult result = null;
+		Result result = null;
 		
-		result = DAO.login(username, password);
+		System.out.println(username);
+		result = service.login(username, password);
 		
 		switch (result.getCode()) {
-		case DAO.DB_STATUS_OK:
-			// login success
+		case Result.SUCCESS:
 			User user = (User) result.getResultObject();
 			HttpSession session = request.getSession();
 			session.setAttribute(MyServletUtil.SESS_USER, user);
 			page = MyServletUtil.mainJspPage;
 			break;
-		case DAO.DB_STATUS_ERR_USER_NOT_EXIST:
+		case Result.ERR_USER_NOT_EXIST:
 			request.setAttribute("msg","用户名不存在！");
 			break;
-		case DAO.DB_STATUS_ERR_EMAIL_NOT_EXIST:
+		case Result.ERR_EMAIL_NOT_EXIST:
 			request.setAttribute("msg","邮箱不存在！");
 			break;
-		case DAO.DB_STATUS_ERR_PASSWORD:
+		case Result.ERR_PASSWORD:
 			request.setAttribute("msg","密码错误！");
 			break;
-		case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
+		case Result.ERR_USER_NOT_ACTIVATED:
 			request.setAttribute("msg","用户未激活！");
 			break;
-		case DAO.DB_STATUS_ERR_SQL:
+		case Result.ERR_SQL:
 			System.err.println("数据库错误！");
 		default:
 			request.setAttribute("msg","未知错误！");

@@ -11,16 +11,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.JSONUtil;
 
 /**
  * Servlet implementation class ApiViewPhoto
  */
-@WebServlet(ApiController.API_ROOT + "/view_photo")
+@WebServlet(ApiUtil.API_ROOT + "/view_photo")
 public class ApiViewPhoto extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	private UserService service = ServiceFactory.createUserService();
+           
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -32,13 +36,13 @@ public class ApiViewPhoto extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.doCommonTasks(request, response);
-		int status = ApiController.API_ERR_OTHER;
+		ApiUtil.doCommonTasks(request, response);
+		int status = ApiUtil.API_ERR_OTHER;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
 		if(uidStr == null) {
-			status = ApiController.API_ERR_BAD_ARGS;
+			status = ApiUtil.API_ERR_BAD_ARGS;
 		} else {
 			int uid = 0;
 			try {
@@ -47,16 +51,22 @@ public class ApiViewPhoto extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			String photoUrl = DAO.getPhotoUrl(uid);
+			Result resultObj = service.getUserById(uid);
+			int result = resultObj.getCode();
+			User user = (User) resultObj.getResultObject();
+			String photoUrl = null;
+			if(result == Result.SUCCESS && user != null) {
+				photoUrl = service.getFullPhotoUrl(user);
+			}
 			//System.out.println(photoUrl);
 			if(photoUrl == null) {
-				status = ApiController.API_ERR_BAD_USER_ID;
+				status = ApiUtil.API_ERR_BAD_USER_ID;
 			} else {
-				status = ApiController.API_ACTION_OK;
+				status = ApiUtil.API_ACTION_OK;
 				map.put("photoUrl", photoUrl);
 			}
 		}
-		String msg = ApiController.API_CODE_STRINGS.get(status);
+		String msg = ApiUtil.API_CODE_STRINGS.get(status);
 		map.put("code", status);
 		map.put("result", msg);
 		//System.out.println(status);

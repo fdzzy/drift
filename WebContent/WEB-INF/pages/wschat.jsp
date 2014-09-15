@@ -1,4 +1,4 @@
-<%@page import="com.drift.core.User"%>
+<%@page import="com.drift.bean.User"%>
 <%@ page contentType="text/html; charset=utf8" %>
 <html>
 <head>

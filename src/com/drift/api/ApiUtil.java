@@ -8,10 +8,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
+import com.drift.service.impl.Result;
 import com.drift.servlet.MyServletUtil;
 
-public class ApiController {
+public class ApiUtil {
 	
 	public static final String API_ROOT = "/api";
 	
@@ -62,42 +62,48 @@ public class ApiController {
 		}
 	};
 	
-	public static int mapDBCode(int db_code) {		
+	public static int mapCode(int internalCode) {		
 		int code;
 		
-		switch (db_code) {
-		case DAO.DB_STATUS_OK:
+		switch (internalCode) {
+		case Result.SUCCESS:
 			code = API_ACTION_OK;
 			break;
-		case DAO.DB_STATUS_ERR_BAD_ARGS:
+		case Result.ERR_BAD_ARGS:
 			code = API_ERR_BAD_ARGS;
 			break;
-		case DAO.DB_STATUS_ERR_PASSWORD:
+		case Result.ERR_PASSWORD:
 			code = API_ERR_PASSWORD;
 			break;
-		case DAO.DB_STATUS_ERR_USER_NOT_EXIST:
+		case Result.ERR_USER_NOT_EXIST:
 			code = API_ERR_USERNAME_NOT_EXIST;
 			break;
-		case DAO.DB_STATUS_ERR_EMAIL_NOT_EXIST:
+		case Result.ERR_EMAIL_NOT_EXIST:
 			code = API_ERR_EMAIL_NOT_EXIST;
 			break;
-		case DAO.DB_STATUS_ERR_USER_NOT_ACTIVATED:
+		case Result.ERR_USER_NOT_ACTIVATED:
 			code = API_ERR_USER_NOT_ACTIVATED;
 			break;
-		case DAO.DB_STATUS_ERR_USER_EXISTS:
+		case Result.ERR_USER_EXISTS:
 			code = API_ERR_USERNAME_UNAVALABLE;
 			break;
-		case DAO.DB_STATUS_ERR_EMAIL_EXISTS:
+		case Result.ERR_EMAIL_EXISTS:
 			code = API_ERR_EMAIL_UNAVALABLE;
 			break;
-		case DAO.DB_STATUS_ERR_USER_ID:
+		case Result.ERR_USER_ID:
 			code = API_ERR_BAD_USER_ID;
 			break;
-		case DAO.DB_STATUS_ERR_BOTTLE_ID:
+		case Result.ERR_FRIEND_ID:
+			code = API_ERR_BAD_FRIEND_ID;
+			break;
+		case Result.ERR_BOTTLE_ID:
 			code = API_ERR_BAD_BOTTLE_ID;
 			break;
-		case DAO.DB_STATUS_ERR_NO_BOTTLE:
+		case Result.ERR_NO_BOTTLE:
 			code = API_ERR_NO_BOTTLE;
+			break;
+		case Result.ERR_NO_MESSAGE:
+			code = API_ERR_NO_MESSAGE;
 			break;
 		default:
 			code = API_ERR_OTHER;

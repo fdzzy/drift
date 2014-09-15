@@ -13,16 +13,10 @@
 </center></p><hr/>
 <center>
 <%
-	User targetUser = null;
-
-int id = Integer.parseInt(request.getParameter("id"));
-
 //System.out.println("\"" + user + "\"" + "发送了消息：\"" + content + "\"");
 
-int rtval = 0;
-String photoUrl = "";
-targetUser = DAO.getUser(id);
-photoUrl = DAO.getPhotoUrl(id);
+User targetUser = (User)request.getAttribute("targetUser");
+String photoUrl = (String) request.getAttribute("photoUrl");
 
 if(targetUser == null) {
 	out.println("请稍后重试！");

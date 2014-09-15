@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
+
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class CheckUsernameServlet
@@ -32,7 +34,13 @@ public class CheckUsernameServlet extends HttpServlet {
 		
 		MyServletUtil.setCharacterEncoding(request, response);
 		String username = request.getParameter("username");
-		System.out.println(username);
+		/**
+		 * TODO: need some further investigation here, although we called requset.setCharacterEncoding
+		 * we still need the following line to get the correct character
+		 * Answer: Seems the setCharacterEncoding is only effective for POST method
+		 */
+		username = new String(username.getBytes("ISO8859-1"), "UTF-8");
+		//System.out.println(username);
 		PrintWriter out = response.getWriter();
 		
 		if(username == null || username.isEmpty()) {
@@ -40,10 +48,8 @@ public class CheckUsernameServlet extends HttpServlet {
 			return;
 		}		
 		
-		int result = DAO.DB_STATUS_ERR_GENERIC;
-		result = DAO.checkUsername(username);
-		
-		if(result == DAO.DB_STATUS_OK) {
+		int result = ServiceFactory.createUserService().checkUsername(username);		
+		if(result == Result.SUCCESS) {
 			out.print("true");
 		} else {
 			out.print("false");

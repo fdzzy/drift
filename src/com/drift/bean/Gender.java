@@ -1,4 +1,4 @@
-package com.drift.core;
+package com.drift.bean;
 
 public enum Gender {
 	

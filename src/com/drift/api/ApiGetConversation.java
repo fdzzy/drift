@@ -12,17 +12,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.ChatMessage;
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
+import com.drift.bean.ChatMessage;
+import com.drift.service.MessageService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.JSONUtil;
 
 /**
  * Servlet implementation class ApiGetConversation
  */
-@WebServlet(ApiController.API_ROOT + "/get_conversation")
+@WebServlet(ApiUtil.API_ROOT + "/get_conversation")
 public class ApiGetConversation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private MessageService mService = ServiceFactory.createMessageService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -36,14 +38,14 @@ public class ApiGetConversation extends HttpServlet {
 	 */
 	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.doCommonTasks(request, response);
-		int status = ApiController.API_ERR_OTHER;
+		ApiUtil.doCommonTasks(request, response);
+		int status = ApiUtil.API_ERR_OTHER;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
 		String friendIdStr = request.getParameter("friendId");
 		if(uidStr == null || friendIdStr == null) {
-			status = ApiController.API_ERR_BAD_ARGS;
+			status = ApiUtil.API_ERR_BAD_ARGS;
 		} else {
 			int uid = 0, friendId = 0;
 			try {
@@ -53,26 +55,19 @@ public class ApiGetConversation extends HttpServlet {
 				e.printStackTrace();
 			}
 			
-			if(uid <= 0 || (DAO.checkUser(uid) ==  false)) {
-				status = ApiController.API_ERR_BAD_USER_ID;
-			} else if(friendId <= 0 || (DAO.checkUser(friendId) == false)) {
-				status = ApiController.API_ERR_BAD_FRIEND_ID;
-			} else {
-				List<ChatMessage> messages = null;
-				DBResult result = DAO.getConversation(uid, friendId);
-				status = ApiController.mapDBCode(result.getCode());
+			Result result = mService.readAndFlagConversation(uid, friendId);
+			status = ApiUtil.mapCode(result.getCode());
 
-				if(status == ApiController.API_ACTION_OK) {
-					messages = (List<ChatMessage>) result.getResultObject();
-					if(messages == null || messages.isEmpty()) {
-						status = ApiController.API_ERR_NO_MESSAGE;
-					} else {
-						map.put("messages", messages);
-					}
+			if(status == ApiUtil.API_ACTION_OK) {
+				List<ChatMessage> messages = (List<ChatMessage>) result.getResultObject();
+				if(messages == null || messages.isEmpty()) {
+					status = ApiUtil.API_ERR_NO_MESSAGE;
+				} else {
+					map.put("messages", messages);
 				}
 			}
 		}
-		String msg = ApiController.API_CODE_STRINGS.get(status);
+		String msg = ApiUtil.API_CODE_STRINGS.get(status);
 		map.put("code", status);
 		map.put("result", msg);
 		//System.out.println(status);

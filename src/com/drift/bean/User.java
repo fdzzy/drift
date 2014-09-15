@@ -1,6 +1,5 @@
-package com.drift.core;
+package com.drift.bean;
 
-import java.sql.Timestamp;
 //import java.text.DateFormat;
 //import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -9,27 +8,26 @@ import java.util.Map;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
+
 public class User implements Comparable<User>, JSONAware {
+
+	public enum SiteType {LOCAL, SINA, RENREN, QQ, BAIDU, LAST /* Keep this the last one */ }	
 
 	private int uid = 0;
 	private String username = null;
 	private String nickname = null;
 	private Gender sex = null;
+	private String birthday = null;
 	private String school = null;
+	private int enrollYear;
 	private String department = null;
 	private String major = null;
 	private String email = null;
-	private String birthday = null;
-	private String enrollYear = null;
-	private Timestamp register_ts = null;
+	private long register_ts = 0;	/* TODO: may cause security issue */
+	private String photoUrl = null;
+	private SiteType siteType;
+	private String foreignUid;
 	
-	public Timestamp getRegisterTs() {
-		return register_ts;
-	}
-
-	public void setRegisterTs(Timestamp ts) {
-		this.register_ts = ts;
-	}
 	
 	@Override
 	public String toString() {
@@ -52,20 +50,47 @@ public class User implements Comparable<User>, JSONAware {
 		
 		JSONObject obj = new JSONObject(map);
 		return obj.toJSONString();
-	}
-	
-	
+	}	
 
 	public User() {
 	}
 	
-	public User(int uid, String username, String nickname, Gender sex, String school, String department,
-			String major, String email, String birthday, String enrollYear, Timestamp ts)
+	/**
+	 * Used to create a user, and save to DB
+	 * @throws Exception, when arguments are illegal
+	 * 
+	 * @param birthday: caller's responsibility to make sure it's format is '1990-01-01'
+	 */
+	public User(String username, String nickname, int sex, String school, 
+			String department, String major, String email, String birthday,
+			int enrollYear) throws Exception {
+		if(username == null || username.isEmpty() ||
+				email == null || email.isEmpty() ||
+				(sex != 0 && sex != 1)) {
+			throw new Exception("Bad Arguments");
+		}		
+		this.username = username;
+		this.nickname = nickname;
+		this.sex = Gender.makeGender(sex);
+		this.school = school;
+		this.department = department;
+		this.major = major;
+		this.email = email;
+		this.birthday = birthday;
+		this.enrollYear = enrollYear;
+	}
+	
+	/**
+	 * Used to query for a user from DB
+	 */
+	public User(int uid, String username, String nickname, int sex, String school, 
+			String department, String major, String email, String birthday,
+			int enrollYear,	long ts, String photoUrl)
 	{
 		this.uid = uid;
 		this.username = username;
 		this.nickname = nickname;
-		this.sex = sex;
+		this.sex = Gender.makeGender(sex);
 		this.school = school;
 		this.department = department;
 		this.major = major;
@@ -73,6 +98,7 @@ public class User implements Comparable<User>, JSONAware {
 		this.birthday = birthday;
 		this.enrollYear = enrollYear;
 		this.register_ts = ts;
+		this.photoUrl = photoUrl;
 	}
 	
 	public int compareTo(User another) {
@@ -90,20 +116,28 @@ public class User implements Comparable<User>, JSONAware {
 		}
 	}
 	
-	public void setUid(int id) {
-		this.uid = id;
+	public SiteType getSiteType() {
+		return siteType;
 	}
-	
-	public void setUsername(String username) {
-		this.username = username;
+
+	public String getForeignUid() {
+		return foreignUid;
 	}
-	
+
+	public long getRegisterTs() {
+		return register_ts;
+	}
+
+	public String getPhotoUrl() {
+		return photoUrl;
+	}
+
+	public void setPhotoUrl(String photoUrl) {
+		this.photoUrl = photoUrl;
+	}
+
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
-	}
-	
-	public void setSex(Gender sex) {
-		this.sex = sex;
 	}
 	
 	public void setSchool(String school) {
@@ -118,15 +152,11 @@ public class User implements Comparable<User>, JSONAware {
 		this.major = major;
 	}
 	
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
 	public void setBirthday(String birthday) {
 		this.birthday = birthday;
 	}
 	
-	public void setEnrollYear(String enrollYear) {
+	public void setEnrollYear(int enrollYear) {
 		this.enrollYear = enrollYear;
 	}
 	
@@ -166,8 +196,8 @@ public class User implements Comparable<User>, JSONAware {
 		return email;
 	}
 
-	public String getEnrollYear() {
-		return enrollYear==null ? "" : enrollYear;
+	public int getEnrollYear() {
+		return enrollYear;
 	}
 }
 

@@ -2,6 +2,7 @@
 <%@ page errorPage="errorpage.jsp" %>
 <%@ include file="common.jsp" %>
 <%@ include file="check_login.jsp" %>
+<%@page import="com.drift.bean.User"%>
 
 <html>
 <head>

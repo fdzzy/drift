@@ -11,15 +11,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
+import com.drift.service.MessageService;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.JSONUtil;
 
 /**
  * Servlet implementation class ApiSendMessage
  */
-@WebServlet(ApiController.API_ROOT + "/send_message")
+@WebServlet(ApiUtil.API_ROOT + "/send_message")
 public class ApiSendMessage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private MessageService mService = ServiceFactory.createMessageService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -32,15 +34,15 @@ public class ApiSendMessage extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.doCommonTasks(request, response);
-		int status = ApiController.API_ERR_OTHER;
+		ApiUtil.doCommonTasks(request, response);
+		int status = ApiUtil.API_ERR_OTHER;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String uidStr = request.getParameter("uid");
 		String friendIdStr = request.getParameter("friendId");
 		String content = request.getParameter("content");
 		if(uidStr == null || friendIdStr == null || content == null) {
-			status = ApiController.API_ERR_BAD_ARGS;
+			status = ApiUtil.API_ERR_BAD_ARGS;
 		} else {
 			int uid = 0, friendId = 0;
 			try {
@@ -50,16 +52,10 @@ public class ApiSendMessage extends HttpServlet {
 				e.printStackTrace();
 			}
 			
-			if(uid <= 0 || (DAO.checkUser(uid) ==  false)) {
-				status = ApiController.API_ERR_BAD_USER_ID;
-			} else if(friendId <= 0 || (DAO.checkUser(friendId) == false)) {
-				status = ApiController.API_ERR_BAD_FRIEND_ID;
-			} else {
-				int rtval = DAO.sendMessage(uid, friendId, content);
-				status = ApiController.mapDBCode(rtval);
-			}
+			int result = mService.sendMessage(uid, friendId, content);
+			status = ApiUtil.mapCode(result);
 		}
-		String msg = ApiController.API_CODE_STRINGS.get(status);
+		String msg = ApiUtil.API_CODE_STRINGS.get(status);
 		map.put("code", status);
 		map.put("result", msg);
 		//System.out.println(status);

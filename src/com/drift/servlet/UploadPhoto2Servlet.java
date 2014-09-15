@@ -9,8 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.PhotoUtil;
 
 /**
@@ -19,6 +21,7 @@ import com.drift.util.PhotoUtil;
 @WebServlet("/upload2")
 public class UploadPhoto2Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UserService service = ServiceFactory.createUserService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -43,8 +46,8 @@ public class UploadPhoto2Servlet extends HttpServlet {
 		String path = getServletContext().getRealPath("/photo"); //上传文件目录
 		System.out.println(path);
 		
-		int status = PhotoUtil.uploadPhoto2(request, path, uid);
-		if(status == DAO.DB_STATUS_OK) {
+		int result = PhotoUtil.uploadPhoto2(request, service, path, uid);
+		if(result == Result.SUCCESS) {
 			OutputStream out = response.getOutputStream();
 			out.write("upload succeed".getBytes());
 		}

@@ -2,7 +2,7 @@ package com.drift.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -13,10 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
 
-import com.drift.core.ChatMessage;
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
-import com.drift.core.User;
+import com.drift.bean.ChatMessage;
+import com.drift.bean.User;
+import com.drift.service.MessageService;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class SendReceiveMessage
@@ -24,6 +26,8 @@ import com.drift.core.User;
 @WebServlet(urlPatterns = {"/send_receive"}, asyncSupported=true)
 public class SendReceiveMessage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UserService uService = ServiceFactory.createUserService();
+	private MessageService mService = ServiceFactory.createMessageService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -62,41 +66,50 @@ public class SendReceiveMessage extends HttpServlet {
 		}
 		User friend = null;
 		if(action == null) {
-			List<ChatMessage> messages = null;
-			DBResult result = DAO.getConversation(user.getUid(), friendId);
-			if(result.getCode() == DAO.DB_STATUS_OK) {
-				messages = (List<ChatMessage>) result.getResultObject();
+			Result resultObj =  uService.getUserById(friendId);
+			if(resultObj.getCode() != Result.SUCCESS) return;			
+			friend = (User) resultObj.getResultObject();
+			
+			List<ChatMessage> messages = new ArrayList<ChatMessage>();
+			resultObj =  mService.readAndFlagConversation(user.getUid(), friendId);
+			if(resultObj.getCode() == Result.SUCCESS) {
+				messages = (List<ChatMessage>) resultObj.getResultObject();
 			}
-			friend = DAO.getUser(friendId);
 			
 			request.setAttribute("friend", friend);
 			request.setAttribute("messages", messages);
 			getServletContext().getRequestDispatcher(MyServletUtil.chatJspPage).forward(request, response);
 		} else if(action.equals("receive")) {
 			List<ChatMessage> messages = null;
-			DBResult result = DAO.getNewMessagesFromFriend(user.getUid(), friendId);
-			if(result.getCode() == DAO.DB_STATUS_OK) {
-				messages = (List<ChatMessage>) result.getResultObject();
+			Result resultObj = mService.readAndFlagUnreadFromFriend(user.getUid(), friendId);
+			messages = (List<ChatMessage>) resultObj.getResultObject();
+			//System.out.println(resultObj.getCode());
+			//System.out.println(messages);
+			if(resultObj.getCode() == Result.SUCCESS && messages != null) {
+				JSONArray array = new JSONArray();
+				for(ChatMessage msg : messages) {
+					array.add(msg);
+				}
+				out.print(array);
 			}
-			
-			JSONArray array = new JSONArray();
-			for(ChatMessage msg : messages) {
-				array.add(msg);
-			}
-			out.print(array);
 		} else if(action.equals("send")) {
 			String content = (String) request.getParameter("content");
 			List<ChatMessage> messages = null;
+			
+			Result resultObj =  uService.getUserById(friendId);
+			if(resultObj.getCode() != Result.SUCCESS) return;			
+			friend = (User) resultObj.getResultObject();
+			
 			int uid = user.getUid();
-			friend = DAO.getUser(friendId);
-			int rtval = DAO.sendMessage(uid, friendId, content);
-			if(rtval == DAO.DB_STATUS_OK) {
-				DBResult result = DAO.getNewMessagesFromFriend(uid, friendId);
-				if(result.getCode() == DAO.DB_STATUS_OK) {
-					messages = (List<ChatMessage>) result.getResultObject();
+			int result = mService.sendMessage(uid, friendId, content);
+			//System.out.println(result);
+			if(result == Result.SUCCESS) {
+				resultObj = mService.readAndFlagUnreadFromFriend(uid, friendId);
+				messages = (List<ChatMessage>) resultObj.getResultObject();
+				if(resultObj.getCode() != Result.SUCCESS || messages == null) {
+					messages = new ArrayList<ChatMessage>();
 				}
-				messages.add(new ChatMessage(0, uid, user.getUsername(), friendId, friend.getUsername(),
-						new Timestamp(System.currentTimeMillis()), content));
+				messages.add(new ChatMessage(0, uid, friendId, System.currentTimeMillis(), content));
 				JSONArray array = new JSONArray();
 				for(ChatMessage msg : messages) {
 					array.add(msg);

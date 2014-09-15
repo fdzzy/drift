@@ -17,20 +17,21 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import com.drift.core.DAO;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
 import com.drift.servlet.MyServletUtil;
 
 public class PhotoUtil {
 	
-	public static int downloadForeignPhoto(String address, String path, User user) {
+	public static int downloadForeignPhoto(UserService service, String address, String path, User user) {
 		
 		if(address == null || address.isEmpty() ||
 				path == null || path.isEmpty() || user == null) {
-			return DAO.DB_STATUS_ERR_BAD_ARGS;
+			return Result.ERR_BAD_ARGS;
 		}
 		
-		int dbStatus = DAO.DB_STATUS_ERR_GENERIC;
+		int result = Result.ERR_GENERIC;
 		
 		int uid = user.getUid();
 		long currentTime = System.currentTimeMillis();
@@ -42,11 +43,13 @@ public class PhotoUtil {
 			userpath.mkdirs();
 		String newFileName = Long.toString(currentTime)+".jpg";
 		//System.out.println(newFileName);
-		dbStatus = DAO.setPhoto(uid, newFileName);					
+		user.setPhotoUrl(newFileName);
+		result = service.editProfile(user);
+		//dbStatus = DAO.setPhoto(uid, newFileName);					
 		urlDownload(address, uploadPath, newFileName);
 		FileUtil.limitFiles(uploadPath);
 		
-		return dbStatus;		
+		return result;		
 	}
 	
 	private static void urlDownload(String urlAddress, String path, String filename) {
@@ -83,12 +86,12 @@ public class PhotoUtil {
 		}
 	}
 	
-	public static int uploadPhoto(HttpServletRequest request, String path, int uid) {
+	public static int uploadPhoto(HttpServletRequest request, UserService service, String path, int uid) {
 		
-		int dbStatus = DAO.DB_STATUS_ERR_GENERIC;
+		int result = Result.ERR_GENERIC;
 		
 		if(uid <=0 || request == null || path == null || path.isEmpty()) {
-			return DAO.DB_STATUS_ERR_BAD_ARGS;
+			return Result.ERR_BAD_ARGS;
 		}
 		
 		File tempPathFile = new File(path+"/tmp");
@@ -97,7 +100,12 @@ public class PhotoUtil {
 		}
 		
 		try {
-			User user = DAO.getUser(uid);
+			Result resultObj = service.getUserById(uid);
+			User user = (User) resultObj.getResultObject();
+			if(resultObj.getCode() != Result.SUCCESS || user == null) {
+				return Result.ERR_USER_ID;
+			}
+			
 			
 			// Create a factory for disk-based file items
 			DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -136,7 +144,9 @@ public class PhotoUtil {
 					//System.out.println(newFileName);
 					File savedFile = new File(userpath, newFileName);
 					fi.write(savedFile);
-					dbStatus = DAO.setPhoto(uid, newFileName);					
+					//dbStatus = DAO.setPhoto(uid, newFileName);
+					user.setPhotoUrl(newFileName);
+					result = service.editProfile(user);
 					FileUtil.limitFiles(uploadPath);
 				}
 			}
@@ -144,18 +154,18 @@ public class PhotoUtil {
 			e.printStackTrace();
 		}
 		
-		return dbStatus;
+		return result;
 	}
 	
 	/*
 	 * This is used for the stream based upload, i.e. the xiuxiu uploadType 1
 	 */
-	public static int uploadPhoto2(HttpServletRequest request, String path, int uid) {
+	public static int uploadPhoto2(HttpServletRequest request, UserService service, String path, int uid) {
 		
-		int dbStatus = DAO.DB_STATUS_ERR_GENERIC;
+		int result = Result.ERR_GENERIC;
 		
 		if(uid <=0 || request == null || path == null || path.isEmpty()) {
-			return DAO.DB_STATUS_ERR_BAD_ARGS;
+			return Result.ERR_BAD_ARGS;
 		}
 		
 		File tempPathFile = new File(path+"/tmp");
@@ -164,7 +174,11 @@ public class PhotoUtil {
 		}
 		
 		try {
-			User user = DAO.getUser(uid);
+			Result resultObj = service.getUserById(uid);
+			User user = (User) resultObj.getResultObject();
+			if(resultObj.getCode() != Result.SUCCESS || user == null) {
+				return Result.ERR_USER_ID;
+			}
 			
 			long currentTime = System.currentTimeMillis();
 			//String newFileName = user.getEmail()+"_"+Long.toString(currentTime)+".jpg";
@@ -188,7 +202,9 @@ public class PhotoUtil {
 			}
 			fos.close();
 			
-			dbStatus = DAO.setPhoto(uid, newFileName);
+			//dbStatus = DAO.setPhoto(uid, newFileName);
+			user.setPhotoUrl(newFileName);
+			result = service.editProfile(user);
 			FileUtil.limitFiles(uploadPath);
 			
 //			// Create a factory for disk-based file items
@@ -224,6 +240,6 @@ public class PhotoUtil {
 			e.printStackTrace();
 		}
 		
-		return dbStatus;
+		return result;
 	}
 }

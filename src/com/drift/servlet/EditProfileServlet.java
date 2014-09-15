@@ -8,8 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class EditProfileServlet
@@ -17,7 +19,8 @@ import com.drift.core.User;
 @WebServlet("/edit_profile")
 public class EditProfileServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	private UserService service = ServiceFactory.createUserService();
+
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -36,39 +39,51 @@ public class EditProfileServlet extends HttpServlet {
 			return;
 		}
 		
-		int uid = user.getUid();
 		String action = request.getParameter("action");
 		if(action != null) {
 			if(action.equals("edit")) {
-				doEdit(request,response,uid);				
+				doEdit(request,response,user);				
 			}
 		}
 		
-		String photoUrl = DAO.getPhotoUrl(uid);
-		request.setAttribute("photoUrl",photoUrl);
+		// Refresh User in case the photo url is changed
+		user = (User) service.getUserById(user.getUid()).getResultObject();
+		request.getSession().setAttribute(MyServletUtil.SESS_USER, user);
+		request.setAttribute("photoUrl",service.getFullPhotoUrl(user));
 		getServletContext().getRequestDispatcher(MyServletUtil.editProfileJspPage).forward(request, response);
 	}
 
-	private void doEdit(HttpServletRequest request, HttpServletResponse response, int uid) {
+	private void doEdit(HttpServletRequest request, HttpServletResponse response, User user) {
 		
 		String nickname = request.getParameter("nickname");
 		String birthday = request.getParameter("birthday");		//example: '1990-01-01'
 		String school = request.getParameter("school");
 		String department = request.getParameter("department");
 		String major = request.getParameter("major");
-		String enrollYear = request.getParameter("enrollYear");
-		if(enrollYear==null || enrollYear.isEmpty())
-			enrollYear = 0 + "";
+		String enrollYearStr = request.getParameter("enrollYear");
+
+		int enrollYear = 0;
+		try {
+			enrollYear = Integer.parseInt(enrollYearStr);
+		} catch (Exception e) {
+			// nothing big deal
+		}
 		
 		if(nickname == null || birthday == null || school == null || department == null
 				|| department == null || major == null) {
-			System.err.println("Edit Profile: null input!");
+			System.err.println("Edit Profile: error input!");
 			return;
 		}
 		
-		int rtval = DAO.DB_STATUS_ERR_GENERIC;
-		rtval = DAO.editProfile(uid, nickname, birthday, school, department, enrollYear, major);
-		if(rtval == DAO.DB_STATUS_OK) {
+		user.setNickname(nickname);
+		user.setBirthday(birthday);
+		user.setSchool(school);
+		user.setDepartment(department);
+		user.setMajor(major);
+		user.setEnrollYear(enrollYear);
+		
+		int result = service.editProfile(user);
+		if(result == Result.SUCCESS) {
 			String msg = "<center><p><font color='green'>修改成功！</font></p></center>";
 			request.setAttribute("msg",msg);
 		} else {

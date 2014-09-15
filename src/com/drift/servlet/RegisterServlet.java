@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.bean.User.SiteType;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.PhotoUtil;
 
 /**
@@ -20,6 +22,7 @@ import com.drift.util.PhotoUtil;
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UserService service = ServiceFactory.createUserService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -55,7 +58,7 @@ public class RegisterServlet extends HttpServlet {
 		String school = request.getParameter("school");
 		String department = request.getParameter("department");
 		String major = request.getParameter("major");
-		String enrollYear = request.getParameter("enrollYear");
+		String enrollYearStr = request.getParameter("enrollYear");
 		String email = request.getParameter("email");
 		
 		String f_uid = request.getParameter("f_uid");
@@ -71,20 +74,35 @@ public class RegisterServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		DBResult result = DAO.registerForeign(DAO.USER_TYPE_SINA,
-			f_uid, username, nickname, sex, birthday, school, department,
-			major, enrollYear, email);
-		
-		if(result.getCode() == DAO.DB_STATUS_OK) {
-			User user = (User) result.getResultObject();
+		int enrollYear = 0;		
+		try {
+			enrollYear = Integer.parseInt(enrollYearStr);
+		} catch (Exception e) {
+			// This is not an issue
+		}
+		User user = null;
+
+		Result result = new Result();
+		try {
+			user = new User(username, nickname, sex, school, department,
+					major, email, birthday, enrollYear);
+		} catch (Exception e) {
+			result.setCode(Result.ERR_BAD_ARGS);
+		}
+		if(result.getCode() != Result.ERR_BAD_ARGS) {
+			result = service.registerForeign(user, SiteType.SINA, f_uid);
+		}
+				
+		if(result.getCode() == Result.SUCCESS) {
+			user = (User) result.getResultObject();
 			HttpSession session = request.getSession();
 			session.setAttribute(MyServletUtil.SESS_USER, user);
 			
 			String path = getServletContext().getRealPath("/photo"); //上传文件目录
-			PhotoUtil.downloadForeignPhoto(imgUrl, path, user);
+			PhotoUtil.downloadForeignPhoto(service, imgUrl, path, user);
 			
 			page = MyServletUtil.mainJspPage;
-		} else if(result.getCode() == DAO.DB_STATUS_ERR_EMAIL_REJECTED) {
+		} else if(result.getCode() == Result.ERR_EMAIL_REJECTED) {
 			request.setAttribute("msg", "仅支持*.edu.cn邮箱");
 		} else {
 			request.setAttribute("msg", "第三方注册错误");
@@ -106,11 +124,10 @@ public class RegisterServlet extends HttpServlet {
 			return page;
 		}
 		
-		int result = DAO.DB_STATUS_ERR_GENERIC;
-		result = DAO.checkActivate(email, activateCode);
-		
+		int result = service.doActivation(email, activateCode);		
+		//System.out.println(result);
 		switch (result) {
-		case DAO.DB_STATUS_OK:
+		case Result.SUCCESS:
 			request.setAttribute("msg","<font color='green'>激活成功</font><br/><br/>"
 					+ "<a href='" + MyServletUtil.entryURL + "'>点此登录</a>");
 			break;
@@ -139,7 +156,7 @@ public class RegisterServlet extends HttpServlet {
 		String department = request.getParameter("department");
 		String major = request.getParameter("major");
 		String email = request.getParameter("email");
-		String enrollYear = request.getParameter("enrollYear");
+		String enrollYearStr = request.getParameter("enrollYear");
 		
 		if(username == null || username.isEmpty() ||
 		   password == null || password.isEmpty() || 
@@ -156,22 +173,37 @@ public class RegisterServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		int result = DAO.register(username, nickname, password, sex, birthday, school, 
-					department, major, enrollYear, email);
+		int enrollYear = 0;		
+		try {
+			enrollYear = Integer.parseInt(enrollYearStr);
+		} catch (Exception e) {
+			// This is not an issue
+		}
+		User user = null;
+		int result = Result.ERR_GENERIC;
+		try {
+			user = new User(username, nickname, sex, school, department,
+					major, email, birthday, enrollYear);
+		} catch (Exception e) {
+			result = Result.ERR_BAD_ARGS;
+		}
+		if(result != Result.ERR_BAD_ARGS) {
+			result = service.register(user, password);
+		}
 		
 		switch (result) {
-		case DAO.DB_STATUS_OK:
+		case Result.SUCCESS:
 			page = MyServletUtil.registerOkJspPage;
 			request.setAttribute("username",username);
 			request.setAttribute("email", email);
 			break;
-		case DAO.DB_STATUS_ERR_USER_EXISTS:
+		case Result.ERR_USER_EXISTS:
 			request.setAttribute("msg","用户名已存在！");
-			break;
-		case DAO.DB_STATUS_ERR_EMAIL_EXISTS:
+			break;			
+		case Result.ERR_EMAIL_EXISTS:
 			request.setAttribute("msg","邮箱已被注册！");
 			break;
-		case DAO.DB_STATUS_ERR_SQL:	
+		case Result.ERR_SQL:
 			System.err.println("数据库错误");
 		default:
 			request.setAttribute("msg","未知错误！");

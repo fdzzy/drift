@@ -9,7 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class CheckEmailServlet
@@ -39,14 +40,13 @@ public class CheckEmailServlet extends HttpServlet {
 			return;
 		}		
 		
-		int result = DAO.DB_STATUS_ERR_GENERIC;
-		result = DAO.checkEmail(email);
+		int result = ServiceFactory.createUserService().checkEmail(email);
 		
-		if(result == DAO.DB_STATUS_OK) {
+		if(result == Result.SUCCESS) {
 			out.print("ok");
-		} else if(result == DAO.DB_STATUS_ERR_EMAIL_EXISTS){
+		} else if(result == Result.ERR_EMAIL_EXISTS){
 			out.print("exist");
-		} else if(result == DAO.DB_STATUS_ERR_EMAIL_REJECTED) {
+		} else if(result == Result.ERR_EMAIL_REJECTED) {
 			out.print("reject");
 		} else {
 			out.print("error");

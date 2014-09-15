@@ -8,7 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class ShowUserServlet
@@ -16,6 +19,7 @@ import com.drift.core.User;
 @WebServlet("/show_user")
 public class ShowUserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UserService service = ServiceFactory.createUserService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -35,6 +39,22 @@ public class ShowUserServlet extends HttpServlet {
 			return;	
 		}
 		
+		String idStr = request.getParameter("id");
+		int id = -1;
+		try {
+			id = Integer.parseInt(idStr);
+		} catch (Exception e) {
+			// nothing big deal
+		}
+		if(id <= 0) return;
+		
+		Result result = service.getUserById(id);
+		User targetUser  = (User) result.getResultObject();
+		if(result.getCode() != Result.SUCCESS || targetUser == null) {
+			return;
+		}
+		request.setAttribute("targetUser", targetUser);
+		request.setAttribute("photoUrl", service.getFullPhotoUrl(targetUser));
 		getServletContext().getRequestDispatcher(MyServletUtil.showUserJspPage).forward(request, response);
 	}
 

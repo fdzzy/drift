@@ -11,17 +11,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.UserService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 import com.drift.util.JSONUtil;
 
 /**
  * Servlet implementation class ApiLogin
  */
-@WebServlet(ApiController.API_ROOT + "/login")
+@WebServlet(ApiUtil.API_ROOT + "/login")
 public class ApiLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UserService service = ServiceFactory.createUserService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -34,20 +36,20 @@ public class ApiLogin extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ApiController.doCommonTasks(request, response);
+		ApiUtil.doCommonTasks(request, response);
 		
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		int status = ApiController.API_ERR_OTHER;
-		DBResult result = DAO.login(username, password);
-		status = ApiController.mapDBCode(result.getCode());
-		String msg = ApiController.API_CODE_STRINGS.get(status);
+		int status = ApiUtil.API_ERR_OTHER;
+		Result result = service.login(username, password);
+		status = ApiUtil.mapCode(result.getCode());
+		String msg = ApiUtil.API_CODE_STRINGS.get(status);
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("code", status);
 		map.put("result", msg);
-		if(status == ApiController.API_ACTION_OK) {
+		if(status == ApiUtil.API_ACTION_OK) {
 			User user = (User) result.getResultObject();
 			map.put("uid", user.getUid());
 		}

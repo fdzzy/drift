@@ -40,7 +40,7 @@ function checkEmail(email) {
 						document.getElementById("msg").innerHTML = "<font color='red'>此邮箱已被占用！</font>";
 					} else {
 						emailOK = false;
-						document.getElementById("msg").innerHTML = "<font color='red'>此邮箱不用！</font>";
+						document.getElementById("msg").innerHTML = "<font color='red'>此邮箱不可用！</font>";
 					}
 				}
 			}

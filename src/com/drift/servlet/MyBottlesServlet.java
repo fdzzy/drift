@@ -10,10 +10,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.drift.core.ChatMessage;
-import com.drift.core.DAO;
-import com.drift.core.DBResult;
-import com.drift.core.User;
+import com.drift.bean.ChatMessage;
+import com.drift.bean.User;
+import com.drift.service.MessageService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class MyBottlesServlet
@@ -21,6 +22,7 @@ import com.drift.core.User;
 @WebServlet("/my_bottle")
 public class MyBottlesServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private MessageService mService = ServiceFactory.createMessageService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -43,8 +45,9 @@ public class MyBottlesServlet extends HttpServlet {
 		
 		//Set<User> friends = null;
 		List<ChatMessage> messages = null;
-		DBResult result = DAO.getMyBottles(user.getUid(), 0, 30);
-		if(result.getCode() == DAO.DB_STATUS_OK) {
+		//Result result = DAO.getMyBottles(user.getUid(), 0, 30);
+		Result result = mService.getMyBottles(user, 0, 30);
+		if(result.getCode() == Result.SUCCESS) {
 			messages = (List<ChatMessage>) result.getResultObject();
 		}
 		
@@ -56,7 +59,7 @@ public class MyBottlesServlet extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.println("<html><head>");
 			out.println("<meta http-equiv='Content-Type' content='text/html;charset=utf-8' />");
-			out.println("</head><body><center><p>暂无消息</p><p><a href='main.jsp'>返回</a></p></center></body>");
+			out.println("</head><body><center><p>暂无消息</p><p><a href='main'>返回</a></p></center></body>");
 			return;
 		}
 	}

@@ -13,8 +13,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 
-import com.drift.core.DAO;
-import com.drift.core.User;
+import com.drift.bean.User;
+import com.drift.service.MessageService;
+import com.drift.service.impl.Result;
+import com.drift.service.impl.ServiceFactory;
 
 /**
  * Servlet implementation class UpdateStateServlet
@@ -22,6 +24,7 @@ import com.drift.core.User;
 @WebServlet("/update_state")
 public class UpdateStateServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private MessageService mService = ServiceFactory.createMessageService();
 	
 	//private static Set<User> onlineUsers = null;
        
@@ -46,7 +49,10 @@ public class UpdateStateServlet extends HttpServlet {
 		
 		//onlineUsers.add(user);
 		int messageCount = 0;
-		messageCount = DAO.getNewMessageCount(user.getUid());
+		Result resultObj = mService.getNewMessageCount(user.getUid());
+		if(resultObj.getCode() == Result.SUCCESS) {
+			messageCount = (Integer) resultObj.getResultObject();
+		}
 		//System.out.println(messageCount);
 		
 		Map<String, Object> map = new HashMap<String, Object>();

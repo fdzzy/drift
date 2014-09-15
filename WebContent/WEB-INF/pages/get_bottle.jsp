@@ -1,5 +1,5 @@
 <%@page import="com.drift.servlet.MyServletUtil"%>
-<%@page import="com.drift.core.User"%>
+<%@page import="com.drift.bean.User"%>
 <%@ page contentType="text/html; charset=utf8" %>
 <%@ page errorPage="errorpage.jsp" %>
 <%@ include file="common.jsp" %>
@@ -21,19 +21,19 @@ Bottle bottle = (Bottle)request.getAttribute("bottle");
 if(user == null || bottle == null) {
 	out.println("请稍后重试！");
 %>
-  <a href="main.jsp">返回</a>
+  <a href="main">返回</a>
 <%
 	return;
 }
-int senderUid = bottle.getSenderId();
-String photoUrl = DAO.getPhotoUrl(senderUid);
+String photoUrl = (String) request.getAttribute("senderPhoto");
+String senderName = (String) request.getAttribute("senderName");
 %>
 
-<form action="do_post.jsp" method="post" onsubmit='return checkinfo(this)'>
+<form action="do_post" method="post" onsubmit='return checkinfo(this)'>
 <center>
 <table>
 <tr>
-  <td><center>来自：<%=bottle.getSenderName()%>
+  <td><center>来自：<%=senderName%>
   <img src="<%=photoUrl%>" height="30" width="30"/></center></td>  
 </tr>
 <tr>
@@ -60,7 +60,7 @@ String photoUrl = DAO.getPhotoUrl(senderUid);
   <a href="handle_bottle?action=sendback&bid=<%=bottle.getBottleId()%>">抛回海里</a> 
   &nbsp;
   <!-- 
-  <a href="main.jsp">返回</a>
+  <a href="main">返回</a>
   -->
 
 </center>

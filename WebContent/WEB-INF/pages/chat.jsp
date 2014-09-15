@@ -1,5 +1,7 @@
+<%@page import="com.drift.service.impl.ServiceFactory"%>
+<%@page import="com.drift.service.UserService"%>
 <%@page import="com.drift.servlet.MyServletUtil"%>
-<%@page import="com.drift.core.User"%>
+<%@page import="com.drift.bean.User"%>
 <%@page import="java.util.*"%>
 <%@page import="java.text.*"%>
 <%@ page contentType="text/html; charset=utf8" %>
@@ -199,8 +201,9 @@ if(messages == null || friend == null) {
 	return;
 }
 
-String friendPhotoUrl = DAO.getPhotoUrl(friend.getUid()); 
-String myPhotoUrl = DAO.getPhotoUrl(user.getUid());
+UserService service = ServiceFactory.createUserService();
+String friendPhotoUrl = service.getFullPhotoUrl(friend); 
+String myPhotoUrl = service.getFullPhotoUrl(user); 
 %>
 
 <a href="show_user?id=<%=friend.getUid()%>">

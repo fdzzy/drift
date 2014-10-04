@@ -43,18 +43,6 @@
     <res-type>javax.sql.DataSource</res-type>
     <res-auth>Container</res-auth>
   </resource-ref>
-
-	<!-- To test on the local machine, need to comment out this
-	<filter>
-		<filter-name>CorsFilter</filter-name>
-		<filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>CorsFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	-->
-  
   <welcome-file-list>
     <welcome-file>login</welcome-file>
   </welcome-file-list>
